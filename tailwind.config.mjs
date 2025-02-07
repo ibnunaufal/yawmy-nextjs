@@ -10,6 +10,9 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        customBlue: "#65C9FF",
+        textColorPrimary: "var(--text-color-primary)",
+        textColorSecondary: "var(--text-color-secondary)"
       },
     },
   },
