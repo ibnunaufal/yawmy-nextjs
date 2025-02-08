@@ -43,6 +43,7 @@ export default function Quran() {
 
   return (
     <div className="h-screen py-2">
+      <title>Quran Reader | Yawmy</title>
         <HeadComponent title="Quran" />
       <div className="">
         <div>
