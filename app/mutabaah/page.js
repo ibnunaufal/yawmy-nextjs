@@ -3,10 +3,12 @@ import HeadComponent from "@/components/HeadComponent";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import moment from "moment";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Mutabaah() {
+  const router = useRouter();
   let dayInAWeek = ["Aha", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
   let [mutabaah, setMutabaah] = useState([]);
   let [dateArray, setDateArray] = useState([]);
@@ -82,6 +84,9 @@ export default function Mutabaah() {
       );
       return;
     }
+
+    let mutabaahDate = moment(date).format("YYYY-MM-DD");
+    router.push(`/mutabaah/${mutabaahDate}`);
   };
 
   return (
