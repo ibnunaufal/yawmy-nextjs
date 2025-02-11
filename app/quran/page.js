@@ -1,5 +1,5 @@
 "use client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SurahList from "../SurahList";
 import JuzList from "../JuzList";
 import { useRouter } from "next/navigation";
@@ -12,10 +12,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import HeadComponent from "@/components/HeadComponent";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { History } from "lucide-react";
 
 export default function Quran() {
   const router = useRouter();
@@ -53,55 +56,25 @@ export default function Quran() {
   return (
     <div className="h-screen py-2">
       <title>Quran Reader | Yawmy</title>
-        {/* <HeadComponent title="Quran" /> */}
+      <HeadComponent title="Quran Reader" />
       <div className="">
-        <div>
-          <h1>Quran</h1>
-          <p>Welcome to the Quran page</p>
-        </div>
         {lastOpenedPage && lastOpenedPage !== 0 && (
-          <div className=" flex justify-between rounded-md bg-card-gradient p-4 my-5 shadow-md shadow-foreground/20">
+          <div className=" flex justify-between rounded-base bg-bg border-border border-2 p-4 my-5 shadow-md shadow-foreground/20">
             <div>
-              <div className="flex mt-1 mb-3">
-                <div className="flex items-center mr-2">
-                  <svg
-                    width="33"
-                    height="32"
-                    viewBox="0 0 33 32"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g clip-path="url(#clip0_20_93)">
-                      <path
-                        d="M24.4934 4.21758L21.5161 5.40539L20.9341 4.07812L19.6132 4.22086C18.2878 4.36354 17.1335 4.84118 16.0298 5.71044C14.9258 4.83905 13.7797 4.36184 12.4724 4.2208L11.151 4.07812L10.5695 5.40539L7.59156 4.21758L2.00537 17.2173L5.34102 18.486V27.9215L16.0291 22.5918L26.7172 27.9215V18.4947L30.0802 17.2177L24.4934 4.21758ZM6.98537 25.2681V19.1119L13.988 21.7762L6.98537 25.2681ZM15.207 20.4844L4.19121 16.2933L8.47081 6.33415L9.90998 6.90864L6.23398 15.2935L15.207 18.7352L15.207 20.4844ZM15.207 16.9778L9.01444 14.6027C10.0723 14.0635 11.3286 13.9936 12.4752 14.4589L15.207 15.6516L15.207 16.9778ZM15.207 13.8614L13.1066 12.9446C11.8054 12.4133 10.4018 12.3767 9.128 12.7856L12.1742 5.83835C12.3434 5.88134 13.6483 5.83988 15.207 7.159V13.8614ZM16.8512 7.16004C18.3807 5.87215 19.8246 5.86039 19.9114 5.83841L22.945 12.7587C21.7447 12.3772 20.4396 12.4286 19.1752 12.9446L16.8512 13.8937V7.16004ZM16.8512 15.6659L19.7978 14.4626C20.912 14.0073 22.0747 14.0669 23.0838 14.5961L16.8512 16.9795V15.6659ZM25.0728 25.2681L18.0719 21.7768L25.0728 19.1188V25.2681ZM16.8512 20.4855V18.7356L25.8516 15.2941L22.175 6.90864L23.6144 6.3342L27.894 16.2929L16.8512 20.4855Z"
-                        fill="white"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_20_93">
-                        <rect
-                          width="28.0749"
-                          height="28"
-                          fill="white"
-                          transform="translate(2.00537 2)"
-                        />
-                      </clipPath>
-                    </defs>
-                  </svg>
+              <div className="flex mt-1">
+                <div className="flex items-center mr-1">
+                  <History size={18} />
                 </div>
-                <h3 className="text-lg font-semibold">Terakhir dibaca</h3>
+                <h3 className="text-sm">Terakhir dibaca</h3>
               </div>
               <h3 className="text-lg font-bold"> {lastSuratOpened} </h3>
               <span className="text-sm">
                 Juz {lastJuzOpened}, Hal {lastOpenedPage}{" "}
               </span>
-
-              <div>
-                <button
-                  className="bg-background shadow-md rounded-md py-1 px-2 mt-2 text-xs flex items-center"
-                  onClick={continueReading}
-                >
-                  <span className="">Lanjutkan membaca</span>
+            </div>
+            <div className="flex items-center">
+            <Button onClick={continueReading}>
+                <span className="">Lanjutkan membaca</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -114,78 +87,106 @@ export default function Quran() {
                       clipRule="evenodd"
                     />
                   </svg>
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <Image
-                className=""
-                src="/ic_quran.svg"
-                alt="icon quran"
-                width={150}
-                height={150}
-              />
+                </Button>
             </div>
           </div>
         )}
       </div>
       <div className="my-2">
-      <Tabs defaultValue="account" className="w-[400px]">
-  <TabsList className="grid w-full grid-cols-2">
-    <TabsTrigger value="account">Account</TabsTrigger>
-    <TabsTrigger value="password">Password</TabsTrigger>
-  </TabsList>
-  <TabsContent value="account">
-    <Card>
-      <CardHeader>
-        <CardTitle>Account</CardTitle>
-        <CardDescription>
-          Make changes to your account here. Click save when youre done.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="space-y-1">
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" defaultValue="Pedro Duarte" />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="username">Username</Label>
-          <Input id="username" defaultValue="@peduarte" />
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button variant="noShadow" className="w-full bg-bw text-text">
-          Save changes
-        </Button>
-      </CardFooter>
-    </Card>
-  </TabsContent>
-  <TabsContent value="password">
-    <Card>
-      <CardHeader>
-        <CardTitle>Password</CardTitle>
-        <CardDescription>
-          Change your password here. After saving, youll be logged out.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="space-y-1">
-          <Label htmlFor="current">Current password</Label>
-          <Input id="current" type="password" />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="new">New password</Label>
-          <Input id="new" type="password" />
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button variant="noShadow" className="w-full bg-bw text-text">
-          Save password
-        </Button>
-      </CardFooter>
-    </Card>
-  </TabsContent>
-</Tabs>
+        <Tabs defaultValue="surah" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="surah">Surah</TabsTrigger>
+            <TabsTrigger value="juz">Juz</TabsTrigger>
+          </TabsList>
+          <TabsContent value="surah">
+            <Card>
+              <CardHeader>
+                <CardTitle>Surah</CardTitle>
+                <CardDescription>
+                  <div className="flex justify-between">
+                    <span>Daftar Surah dalam Al-Quran</span>
+                  </div>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <ScrollArea className="h-96">
+                  {SurahList.map((surah) => (
+                    <div
+                      key={surah.id}
+                      className="bg-bg rounded-base border-2 my-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none"
+                      onClick={() => router.push(`/quran/${surah.page}`)}
+                    >
+                      <div className="flex justify-between py-2 pr-4 ">
+                        <div className="flex">
+                          <div className="flex mx-4 px-2 items-center">
+                            <p className="text-textColorPrimary font-bold text-2xl">
+                              {surah.id}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-lg text-textColorPrimary font-bold">
+                              {surah.transliteration}
+                            </p>
+                            <p className="text-textColorSecondary">
+                              {surah.location} • {surah.num_ayah} Ayat{" "}
+                            </p>
+                            <p className="text-textColorSecondary">
+                              {surah.translation}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <p className="text-2xl font-bold">{surah.arabic}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="juz">
+            <Card>
+              <CardHeader>
+                <CardTitle>Juz</CardTitle>
+                <CardDescription>
+                  <div className="flex justify-between">
+                    <span>Daftar Juz dalam Al-Quran</span>
+                  </div>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <ScrollArea className="h-96">
+                  {JuzList.map((juz) => (
+                    <div
+                      key={juz.id}
+                      className="bg-bg rounded-base border-2 my-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none"
+                      onClick={() => router.push(`/quran/${juz.start.page}`)}
+                    >
+                      <div className="flex justify-between py-2 pr-4 ">
+                      <div className="flex">
+                    <div className="flex mx-4 px-2 items-center">
+                      <p className="text-textColorPrimary font-bold text-2xl">
+                        {juz.juz}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-lg text-textColorPrimary">
+                        Juz {juz.juz}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <p className="text-2xl font-bold">{juz.firstWord}</p>
+                  </div>
+                      </div>
+                    </div>
+                  ))}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
         {/* <TabGroup>
           <TabList className="flex justify-between">
             <div>

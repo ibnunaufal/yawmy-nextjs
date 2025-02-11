@@ -8,23 +8,49 @@
   --text-color-primary: #240F4F;
   --text-color-secondary: #8789A3;
   --card-gradient: linear-gradient(135deg, #DF98FA 0%, #9055FF 100%);
+  --main: #FD9745;
+  --secondary: #FFC75F;
+  --overlay: rgba(0, 0, 0, 0.8); /* background color overlay for alert dialogs, modals, etc. */
+
+  --bg: #fff4e0;
+  --bw: #fff; /* white and secondary black e.g. utility class variant would be: bg-[#fff] dark:bg-[#212121] */
+  --blank: #000; /* blank black and white */
+  --border: #000;
+  --text: #000;
+  --mtext: #000; /* text that is placed on background with main color e.g. text color of default button */
+  --ring: #000;
+  --ring-offset: #fff;
+
+  --border-radius: 6px;
+  --box-shadow-x: 0px;
+  --box-shadow-y: 4px;
+  --reverse-box-shadow-x: 0px;
+  --reverse-box-shadow-y: -4px;
+  --base-font-weight: 500;
+  --heading-font-weight: 700;
+
+  --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
 }
 
-/* :root {
-  --background: #EDC28F;
-  --foreground: #473F6E;
-} */
+.dark {
+  --bg: #272933;
+  --bw: #212121;
+  --blank: #fff;
+  --border: #000;
+  --text: #e6e6e6;
+  --mtext: #000;
+  --ring: #fff;
+  --ring-offset: #000;
 
-@media (prefers-color-scheme: dark) {
+  --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
+}
+
+/* @media (prefers-color-scheme: dark) {
   :root {
     --text-color-primary: #ffffff;
     --text-color-secondary: #A19CC5;
   }
-  /* :root {
-    --background: #473F6E;
-    --foreground: #EDC28F;
-  } */
-}
+} */
 
 body {
   color: var(--text-color-primary);
@@ -33,7 +59,7 @@ body {
 .bg-card-gradient {
   background: var(--card-gradient);
 }
-@layer base {
+/* @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -95,4 +121,4 @@ body {
   body {
     @apply bg-background text-foreground;
   }
-}
+} */
