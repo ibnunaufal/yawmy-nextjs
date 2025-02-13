@@ -2,7 +2,8 @@
 import { auth } from "@/utils/auth";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Avatar from "@/components/Avatar";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function HomePage() {
   const [user, setUser] = useState(null);
@@ -31,28 +32,25 @@ export default function HomePage() {
       {/* top item */}
       <div className="flex justify-between my-5">
         <div className="flex flex-col justify-center">
-          <h6 className=" text-sm font-normal">Assalamualaikum 👋</h6>
-          <h1 className=" text-xl font-bold">{user.displayName}</h1>
+          <span className=" text-lg caprasimo">yawmy</span>
         </div>
         <div>
-          <Avatar name={user.photoURL} />
+          <Avatar>
+            <AvatarImage src={user.photoURL} />
+            <AvatarFallback>HH</AvatarFallback>
+          </Avatar>
         </div>
       </div>
 
       {/* date and fill today's mutabaah */}
-      <div className=" flex justify-between bg-foreground rounded-md p-4 my-5">
+      <div className=" flex justify-between bg-card-gradient rounded-md p-4 my-5 border-2 border-black">
         <div>
-          <h1 className="text-2xl text-background ">5 Menit menuju magrib</h1>
-          <h2 className=" text-background">Kamis, 6 Feb 2025</h2>
-          <h2 className=" text-background">12 Syaban 1444 H</h2>
+          <h6 className=" text-sm font-normal">Assalamualaikum 👋</h6>
+          <h1 className=" text-xl caprasimo">{user.displayName}</h1>
         </div>
-        <div className=" flex flex-col">
-          <button className="bg-background p-1 rounded-md active:bg-foreground">
-            Isi mutabaah hari ini
-          </button>
-          <a href="" className="text-background text-center">
-            Apa itu mutabaah?
-          </a>
+        <div className=" flex items-center justify-center flex-col">
+          <h2 className="text-md text-background font-bold mb-1">Kamis, 6 Feb 2025</h2>
+          <Button>Isi mutabaah hari ini</Button>
         </div>
       </div>
 

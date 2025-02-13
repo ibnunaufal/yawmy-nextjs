@@ -1,11 +1,14 @@
 "use client";
 import HeadComponent from "@/components/HeadComponent";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-import moment from "moment";
+import moment, { duration } from "moment";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import { Button } from '@/components/ui/button'
+import { ToastAction } from '@/components/ui/toast'
+import { useToast } from '@/hooks/use-toast'
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Mutabaah() {
   const router = useRouter();
@@ -14,6 +17,8 @@ export default function Mutabaah() {
   let [dateArray, setDateArray] = useState([]);
   let [currentDate, setCurrentDate] = useState(new Date());
   let [firstDayOfWeek, setFirstDayOfWeek] = useState(0);
+  const { toast } = useToast()
+
 
   useEffect(() => {
     generateCurrentMonthArray();
@@ -79,9 +84,11 @@ export default function Mutabaah() {
     }
     let today = new Date();
     if (date.getDate() > today.getDate()) {
-      toast.error(
-        `Tanggal ${date.getDate()} belum bisa diisi, pilih hari ini atau hari sebelumnya ya 😊`
-      );
+      console.log("tanggal belum bisa diisi");
+      toast({
+        description: `Tanggal ${date.getDate()} belum bisa diisi, pilih hari ini atau hari sebelumnya ya 😊`,
+        duration: 2000,
+      });
       return;
     }
 
@@ -91,12 +98,10 @@ export default function Mutabaah() {
 
   return (
     <div className="h-screen py-2">
-      <title>Quran Reader | Yawmy</title>
+      <title>Mutabaah | Yawmy</title>
       <HeadComponent title="Mutabaah" />
-      <Toaster position="top-center" />
-
       <div className="flex justify-between items-center mt-4">
-        <span className="text-xl">
+        <span className="text-xl font-bold">
           {moment(currentDate).format("MMM YYYY")}
         </span>
         <div>
@@ -120,14 +125,14 @@ export default function Mutabaah() {
       </p>
 
       <div className="mb-8 mt-4">
-        <div className="grid grid-cols-7 gap-1 py-2 rounded-t-2xl bg-card-gradient text-white">
+        <div className="grid grid-cols-7 gap-1 py-2 rounded-base bg-main text-black border-2 border-black">
           {dayInAWeek.map((day, index) => (
             <div key={index} className="text-center w-full">
               {day}
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1 rounded-b-2xl pb-4 bg-violet-200">
+        <div className="grid grid-cols-7 gap-1 mt-1 rounded-base pb-4 bg-bg border-2 border-black">
           {dateArray.map((date, index) => (
             <div
               key={index}

@@ -26,6 +26,7 @@ export default function Quran() {
   const [lastOpenedPage, setLastOpenedPage] = useState(0);
   const [lastSuratOpened, setLastSuratOpened] = useState(0);
   const [lastJuzOpened, setLastJuzOpened] = useState(0);
+  const [filteredList, setFilteredList] = useState(SurahList);
 
   const continueReading = () => {
     if (!lastOpenedPage) {
@@ -46,12 +47,25 @@ export default function Quran() {
         setLastJuzOpened(juz.juz);
       }
     });
+    console.log(lastOpenedPage)
+    setFilteredList(SurahList);
     SurahList.map((surah) => {
       if (surah.page <= num && surah.page_end >= num) {
         setLastSuratOpened(surah.latin);
       }
     });
   }, []);
+
+  const handleOnChangeInput = (value) => {
+    if (value === "") {
+      setFilteredList(SurahList);
+      return;
+    }
+    const filtered = SurahList.filter((surah) =>
+      surah.transliteration.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredList(filtered);
+  }
 
   return (
     <div className="h-screen py-2">
@@ -103,14 +117,15 @@ export default function Quran() {
               <CardHeader>
                 <CardTitle>Surah</CardTitle>
                 <CardDescription>
-                  <div className="flex justify-between">
-                    <span>Daftar Surah dalam Al-Quran</span>
+                  <div className="">
+                    <span className="mt-2">Daftar Surah dalam Al-Quran</span>
+                    <Input placeholder="Cari Surah" className="mt-2" type="text" onChange={(e) => handleOnChangeInput(e.target.value)} />
                   </div>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <ScrollArea className="h-96">
-                  {SurahList.map((surah) => (
+                  {filteredList.map((surah) => (
                     <div
                       key={surah.id}
                       className="bg-bg rounded-base border-2 my-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none"

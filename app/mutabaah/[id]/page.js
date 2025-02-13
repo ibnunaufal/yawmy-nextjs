@@ -2,7 +2,7 @@
 import HeadComponent from "@/components/HeadComponent";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { saveMutabaah } from "@/utils/firestore";
+import db, { saveMutabaah } from "@/utils/firestore";
 import { auth } from "@/utils/auth";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -26,11 +26,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { doc, getDoc, setDoc } from "@firebase/firestore";
+
 let mutabaahData = {
   qiyaamul_lail: false,
 
   subuh: false,
-  subuh_rawatib: true,
+  subuh_rawatib: false,
   subuh_jamaah: false,
 
   dhuha: false,
@@ -69,12 +81,14 @@ export default function EvaluatePage() {
   const [currentEmail, setCurrentEmail] = useState("");
 
   const [lastFewDays, setLastFewDays] = useState([]);
+  
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
         console.log("User is logged in:", user.email);
         setCurrentEmail(user.email);
+        getCurrentData(user.email);
       } else {
         router.push("/login");
       }
@@ -82,6 +96,23 @@ export default function EvaluatePage() {
 
     generateLastFewDays();
   }, []);
+
+  function getCurrentData(email) {
+    // check in firestore if there is a record for today and for the current user
+    const docRef = doc(db, `mutabaah/${email}/records/${id}`);
+    getDoc(docRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          console.log("Document data:", docSnap.data());
+          setMutabaah(docSnap.data().mutabaahData);
+        } else {
+          console.log("No such document!");
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting document:", error);
+      });
+  }
 
   const generateLastFewDays = () => {
     let currentDate = moment(Date.now());
@@ -108,14 +139,60 @@ export default function EvaluatePage() {
     });
   };
 
+  const checkAllWajib = () => {
+    setMutabaah({
+      ...mutabaah,
+      subuh: true,
+      subuh_rawatib: true,
+      subuh_jamaah: true,
+      dhuhur: true,
+      dhuhur_rawatib: true,
+      dhuhur_jamaah: true,
+      ashar: true,
+      ashar_rawatib: true,
+      ashar_jamaah: true,
+      magrib: true,
+      magrib_rawatib: true,
+      magrib_jamaah: true,
+      isya: true,
+      isya_rawatib: true,
+      isya_jamaah: true,
+    });
+  };
+
+  const checkAllSunnah = () => {
+    setMutabaah({
+      ...mutabaah,
+      qiyaamul_lail: true,
+      dhuha: true,
+      tarawih: true,
+    });
+  };
+
+  const checkAllLainnya = () => {
+    setMutabaah({
+      ...mutabaah,
+      infaq: true,
+      tilawah: true,
+      puasa: true,
+      dzikir_pagi: true,
+      dzikir_petang: true,
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(mutabaah);
+    saveMutabaah(currentEmail, id, mutabaah).then((res) => {
+      if (res.success) {
+        router.push("/mutabaah");
+      }
+    });
   };
 
   async function saveMutabaah(email, date, mutabaahData) {
     try {
-      const docRef = doc(db, `mutabaah/${email}/dailyRecords/${date}`);
+      const docRef = doc(db, `mutabaah/${email}/records/${date}`);
       await setDoc(docRef, { mutabaahData }, { merge: true });
       console.log("Mutabaah data saved successfully!");
       return { success: true, message: "Mutabaah data saved successfully!" };
@@ -125,21 +202,23 @@ export default function EvaluatePage() {
     }
   }
   return (
-    <div className="flex flex-col min-h-screen ">
+    <div className="flex flex-col min-h-screen py-2">
       <title>Isi Mutabaah | Yawmy</title>
       <HeadComponent title="Mutabaah" />
 
-      <form onSubmit={handleSubmit} className="mt-4 mb-8">
-        <div className="bg-main p-2 border-t-2 border-x-2 border-black rounded-t-base flex justify-end">
-          <h1 className="text-2xl font-bold">
-            {moment(id).format("ddd, DD MMM yyyy")}
-          </h1>
+      <form onSubmit={handleSubmit} className="mb-8">
+        <div className="flex justify-between items-center mt-1">
+          <span className="text-lg font-bold">
+            {moment(id).format("ddd, DD MMM YYYY")}
+          </span>
         </div>
 
-        {/* solat wajib */}
+        <p className="text-gray-600">Lengkapi mutabaah kamu hari ini ya! </p>
+
+        {/* ibadah wajib */}
         <Card className="w-full my-2">
           <CardHeader>
-            <CardTitle>Solat Wajib</CardTitle>
+            <CardTitle>Ibadah Wajib</CardTitle>
           </CardHeader>
           <CardContent>
             <div>
@@ -229,7 +308,6 @@ export default function EvaluatePage() {
                   </div>
                 )}
               </div>
-
               <div className="my-2">
                 <div className="bg-bg p-2 border-2 border-black rounded-base z-10">
                   <div className="flex justify-between space-x-2 items-center">
@@ -359,21 +437,37 @@ export default function EvaluatePage() {
                   </div>
                 )}
               </div>
+              {mutabaah["subuh"] &&
+              mutabaah["dhuhur"] &&
+              mutabaah["ashar"] &&
+              mutabaah["magrib"] &&
+              mutabaah["isya"] ? null : (
+                <div
+                  className="flex justify-end"
+                  onClick={() => {
+                    checkAllWajib();
+                  }}
+                >
+                  <span className="underline text-xs">Pilih Semua</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
-        {/* solat sunnah */}
 
+        {/* solat sunnah */}
         <Card className="w-full my-2">
           <CardHeader>
             <CardTitle>Solat Sunnah</CardTitle>
           </CardHeader>
           <CardContent>
             <div>
-            <div className="my-2">
+              <div className="my-2">
                 <div className="bg-bg p-2 border-2 border-black rounded-base z-10">
                   <div className="flex justify-between space-x-2 items-center">
-                    <Label htmlFor={"qiyaamul_lail"}>{getKeyName("qiyaamul_lail")}</Label>
+                    <Label htmlFor={"qiyaamul_lail"}>
+                      {getKeyName("qiyaamul_lail")}
+                    </Label>
                     <Switch
                       id={"qiyaamul_lail"}
                       name={"qiyaamul_lail"}
@@ -415,6 +509,19 @@ export default function EvaluatePage() {
                   </div>
                 </div>
               </div>
+              {mutabaah["qiyaamul_lail"] &&
+              mutabaah["dhuha"] &&
+              mutabaah["dzikir_pagi"] &&
+              mutabaah["dzikir_petang"] ? null : (
+                <div
+                  className="flex justify-end"
+                  onClick={() => {
+                    checkAllSunnah();
+                  }}
+                >
+                  <span className="underline text-xs">Pilih Semua</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -474,7 +581,9 @@ export default function EvaluatePage() {
               <div className="my-2">
                 <div className="bg-bg p-2 border-2 border-black rounded-base z-10">
                   <div className="flex justify-between space-x-2 items-center">
-                    <Label htmlFor={"dzikir_pagi"}>{getKeyName("dzikir_pagi")}</Label>
+                    <Label htmlFor={"dzikir_pagi"}>
+                      {getKeyName("dzikir_pagi")}
+                    </Label>
                     <Switch
                       id={"dzikir_pagi"}
                       name={"dzikir_pagi"}
@@ -489,7 +598,9 @@ export default function EvaluatePage() {
               <div className="my-2">
                 <div className="bg-bg p-2 border-2 border-black rounded-base z-10">
                   <div className="flex justify-between space-x-2 items-center">
-                    <Label htmlFor={"dzikir_petang"}>{getKeyName("dzikir_petang")}</Label>
+                    <Label htmlFor={"dzikir_petang"}>
+                      {getKeyName("dzikir_petang")}
+                    </Label>
                     <Switch
                       id={"dzikir_petang"}
                       name={"dzikir_petang"}
@@ -501,30 +612,49 @@ export default function EvaluatePage() {
                   </div>
                 </div>
               </div>
+              {mutabaah["infaq"] &&
+              mutabaah["tilawah"] &&
+              mutabaah["puasa"] &&
+              mutabaah["dzikir"] ? null : (
+                <div
+                  className="flex justify-end"
+                  onClick={() => {
+                    checkAllLainnya();
+                  }}
+                >
+                  <span className="underline text-xs">Pilih Semua</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
-        
-        {/* {Object.keys(mutabaah).map((key) => (
-          <div
-            key={key}
-            className="bg-bg p-2 border-x-2 border-t-2 border-black"
-          >
-            <div className="flex justify-between space-x-2 items-center">
-              <Label htmlFor={key}>{getKeyName(key)}</Label>
-              <Switch
-                id={key}
-                name={key}
-                onCheckedChange={(checked) => handleChange(key, checked)}
-                checked={mutabaah[key]}
-              />
-            </div>
-          </div>
-        ))} */}
 
-        <div className="bg-main p-2 border-b-2 border-2 border-black rounded-b-base flex justify-between items-center">
+        <div className="bg-bg p-2 border-2 border-black rounded-base flex justify-between items-center">
           <span>Kalau sudah klik simpan ya!</span>
           <Button type="submit">Simpan</Button>
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button>Open</Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <div className="mx-auto w-[300px]">
+                <DrawerHeader>
+                  <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+                  <DrawerDescription>
+                    This action cannot be undone.
+                  </DrawerDescription>
+                </DrawerHeader>
+                <DrawerFooter className="grid grid-cols-2">
+                  <Button variant="noShadow">Submit</Button>
+                  <DrawerClose asChild>
+                    <Button className="bg-bw text-text" variant="noShadow">
+                      Cancel
+                    </Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
       </form>
     </div>

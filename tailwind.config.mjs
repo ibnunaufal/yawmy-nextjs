@@ -8,9 +8,21 @@ export default {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			jakarta: [
+  				'Plus Jakarta Sans',
+  				'Arial',
+  				'Helvetica',
+  				'sans-serif'
+  			],
+  			caprasimo: [
+  				'Caprasimo',
+  				'cursive'
+  			]
+  		},
   		colors: {
   			main: 'var(--main)',
-			secondary: 'var(--secondary)',
+  			secondary: 'var(--secondary)',
   			overlay: 'var(--overlay)',
   			bg: 'var(--bg)',
   			bw: 'var(--bw)',
@@ -54,11 +66,29 @@ export default {
   				to: {
   					height: '0'
   				}
+  			},
+  			marquee: {
+  				'0%': {
+  					transform: 'translateX(0%)'
+  				},
+  				'100%': {
+  					transform: 'translateX(-100%)'
+  				}
+  			},
+  			marquee2: {
+  				'0%': {
+  					transform: 'translateX(100%)'
+  				},
+  				'100%': {
+  					transform: 'translateX(0%)'
+  				}
   			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+  			marquee: 'marquee 40s linear infinite',
+  			marquee2: 'marquee2 40s linear infinite'
   		}
   	}
   },

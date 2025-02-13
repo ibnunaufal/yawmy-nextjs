@@ -159,16 +159,21 @@ export default function QuranPage({ params }) {
              <Search size={24} />
             </Button>
           </div>
+          <div className="flex items-center">
+            <span className="caprasimo text-xl underline">
+              Quran Reader
+            </span>
+          </div>
           <div>
             <Button
-              onClick={handlePrevPage}
+              onClick={handleNextPage}
               className="mr-2"
             >
               <ChevronLeft size={24} />
             </Button>
 
             <Button
-              onClick={handleNextPage}
+              onClick={handlePrevPage}
             >
               <ChevronRight size={24} />
             </Button>

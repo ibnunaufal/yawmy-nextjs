@@ -5,13 +5,18 @@ import { useRouter } from "next/navigation";
 export default function HeadComponent({ title }) {
   const router = useRouter();
   const handleGoHome = () => {
+    router.push("/home");
+  };
+  const handleGoLandingPage = () => {
     router.push("/");
   };
 
   return (
     <div className="flex justify-between mb-10">
-      <Logo width={36} height={36} className="flex items-center" />
-      <p className="flex items-center font-bold text-lg">{title}</p>
+      <div onClick={handleGoLandingPage}>
+      <Logo width={48} height={48} className="flex items-center" />
+      </div>
+      <p className="flex items-center caprasimo text-lg">{title}</p>
       <div>
         <Button
           onClick={handleGoHome}

@@ -1,6 +1,5 @@
 'use client'
 import AddItemComponent from "@/components/AddItemComponent";
-import Avatar from "@/components/Avatar";
 import ListItems from "@/components/ListItems";
 import Image from "next/image";
 
@@ -26,7 +25,7 @@ export default function Home() {
           </li>
           <li>Save and see your changes instantly.</li>
         </ol>
-        <Avatar name={"man1"} />
+        {/* <Avatar name={"man1"} /> */}
         <AddItemComponent />
         <ListItems />
         <div className="flex gap-4 items-center flex-col sm:flex-row">
