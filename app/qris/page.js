@@ -66,14 +66,15 @@ export default function Qris() {
   };
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        console.log("User is logged in:", user.email);
-        getQrisList();
-      } else {
-        router.push("/login");
-      }
-    });
+    // auth.onAuthStateChanged((user) => {
+    //   if (user) {
+    //     console.log("User is logged in:", user.email);
+    //     getQrisList();
+    //   } else {
+    //     router.push("/login");
+    //   }
+    // });
+    getQrisList();
   }, []);
 
   async function getQrisList() {
@@ -106,19 +107,19 @@ export default function Qris() {
             {/* <Button variant="noShadow">Hover</Button> */}
             <div className="rounded w-fit bg-bg flex items-center p-1 border-black border-2">
               <Lightbulb className="h-4 w-4" />
-              <span className="text-sm">info menarik!</span>
+              <span className="text-sm">Berkontribusi!</span>
             </div>
           </PopoverTrigger>
           <PopoverContent>
             <div className="">
               <span className="text-sm">
                 Anda juga dapat berkontribusi dengan mengunggah kode QRIS Infaq
-                atau sedekah yang Anda miliki.
+                atau sedekah yang Anda miliki atau temui.
               </span>
               <Button
                 variant="reverse"
                 onClick={() => {
-                  alert("aaa");
+                  router.push("/contribute");
                 }}
               >
                 Kontribusi
@@ -203,8 +204,6 @@ export default function Qris() {
         ))}
       </div>
 
-      <h1>QRIS</h1>
-      <p>QRIS is a payment method that uses QR code.</p>
     </div>
   );
 }

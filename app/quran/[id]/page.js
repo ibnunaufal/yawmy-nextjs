@@ -161,7 +161,7 @@ export default function QuranPage({ params }) {
           </div>
           <div className="flex items-center">
             <span className="caprasimo text-xl underline">
-              Quran Reader
+              Quran
             </span>
           </div>
           <div>
