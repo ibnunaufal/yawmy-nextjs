@@ -156,7 +156,7 @@ export default function ContributePage() {
     <div className="h-screen py-2">
       <HeadComponent title="Berkontribusi" />
       <div className="mb-8">
-        <Card className="w-full my-1">
+        <Card className="w-full my-1 bg-bg">
           <CardHeader>
             <CardTitle>Unggah QRIS</CardTitle>
           </CardHeader>
