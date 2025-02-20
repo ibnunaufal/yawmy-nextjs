@@ -130,8 +130,8 @@ const checkUserProfile = async (userData) => {
 
       if (docSnap.exists()) {
           console.log("Document data:", docSnap.data());
-          console.log("Navigating to /home...");
-          router.push("/home");  // Debugging untuk memastikan ini dieksekusi
+          console.log("Navigating to /...");
+          router.push("/");  // Debugging untuk memastikan ini dieksekusi
       } else {
           console.log("No such document!");
           setUser(userData);
@@ -201,7 +201,7 @@ const checkUserProfile = async (userData) => {
 
       // Store auth token
       document.cookie = `authToken=${auth.currentUser.accessToken}; path=/`;
-      router.push("/home");
+      router.push("/");
     } catch (error) {
       console.error("Error saving user data", error);
     }

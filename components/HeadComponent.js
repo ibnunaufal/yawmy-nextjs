@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export default function HeadComponent({ title }) {
   const router = useRouter();
   const handleGoHome = () => {
-    router.push("/home");
+    router.push("/");
   };
   const handleGoLandingPage = () => {
     router.push("/");
