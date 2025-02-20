@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Logo from "@/components/Logo";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,13 +31,14 @@ export default function RootLayout({ children }) {
         <div className="antialiased max-w-lg mx-4 my-0 flex flex-col md:flex-row lg:mx-auto">
           <div className="flex-auto min-w-0 flex flex-col px-2 md:px-0">
             {children}
-            <div className="rounded-t-2xl bg-card-gradient p-4 shadow-md shadow-foreground/20">
+            {/* <div className="rounded-t-2xl bg-card-gradient p-4 shadow-md shadow-foreground/20">
               <span className="text-xs text-black">
                 2025 © Yawmy. All rights reserved.
               </span>
-          </div>
+          </div> */}
           </div>
         </div>
+        <Toaster />
       </body>
     </html>
   );
