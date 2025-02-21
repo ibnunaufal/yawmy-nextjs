@@ -23,6 +23,7 @@ import {
   Info,
   Map,
   MapPin,
+  MessageCircleQuestion,
   MessageCircleWarning,
   Share,
 } from "lucide-react";
@@ -131,29 +132,62 @@ export default function QrisPage() {
                       {qris.city_name} {qris.province_name}
                     </span>
                   </div>
-                  {qris.verified == true ? (
-                    <div className="flex my-2 items-center">
+                  <div className="flex my-2 items-center">
+                    {qris.verified == true ? (
                       <BadgeCheck className="h-4 w-4 mr-2" />
-                      <span>Sudah Terverifikasi oleh</span>
-                    </div>
-                  ) : (
-                    <div className="flex my-2 items-center">
+                    ) : (
                       <BadgeX className="h-4 w-4 mr-2" />
-                      <span>Belum Terverifikasi</span>
+                    )}
+                      <span>{qris.verified == true ? 'Sudah' : 'Belum'} Terverifikasi.</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <span className="flex  items-center text-blue-900 underline ml-2">
+                            Apa maksud verifikasi?
+                          </span>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 text-mtext">
+                          <div className="">
+                            <div className="flex my-2 items-center">
+                              <MessageCircleQuestion className="h-4 w-4 mr-2" />
+                              <span className="font-bold">Verifikasi</span>
+                            </div>
+                            <span className="">
+                              Verifikasi adalah proses pengecekan keaslian QRIS
+                              oleh admin dengan melakukan inquiri menggunakan aplikasi
+                              e-wallet atau M-Banking yang mendukung QRIS.
+                            </span>
+                            <span className="mt-2">
+                              Segala bentuk penyalahgunaan yang terjadi diluar tanggung jawab
+                              kami.
+                            </span>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
-                  )}
                   <div className="flex my-2 items-center">
                     <CloudUpload className="h-4 w-4 mr-2" />
                     <span>Diunggah oleh {qris.uploader.split("|")[0]}</span>
                   </div>
-                  <div className="flex my-2 items-center">
+                  {
+                    qris.mapUrl && (
+                      <div className="flex my-2 items-center">
+                        <Map className="h-4 w-4 mr-2" />
+                        <a href={qris.mapUrl} target="_blank">
+                          <span className="text-blue-900 underline">
+                            Buka di Google Maps
+                          </span>
+                        </a>
+                      </div>
+                    )
+                  }
+                  {/* <div className="flex my-2 items-center">
                     <Map className="h-4 w-4 mr-2" />
                     <a href={"https://naufall.com"} target="_blank">
                       <span className="text-blue-900 underline">
                         Buka di Google Maps
                       </span>
                     </a>
-                  </div>
+                  </div> */}
                 </div>
               </AlertDescription>
             </Alert>
@@ -184,16 +218,16 @@ export default function QrisPage() {
                         Bagikan melalui
                       </span>
                       <div className="flex justify-evenly p-1">
-                        <WhatsappShareButton url={qris.qris} title="QRIS Infaq">
+                        <WhatsappShareButton url={`https://yaw.my.id/qris/${id}`} title={`QRIS ${qris.name}`}>
                           <WhatsappIcon size={24} />
                         </WhatsappShareButton>
-                        <TelegramShareButton url={qris.qris} title="QRIS Infaq">
+                        <TelegramShareButton url={`https://yaw.my.id/qris/${id}`} title={`QRIS ${qris.name}`}>
                           <TelegramIcon size={24} />
                         </TelegramShareButton>
-                        <FacebookShareButton url={qris.qris} quote="QRIS Infaq">
+                        <FacebookShareButton url={`https://yaw.my.id/qris/${id}`} quote={`QRIS ${qris.name}`}>
                           <FacebookIcon size={24} />
                         </FacebookShareButton>
-                        <TwitterShareButton url={qris.qris} title="QRIS Infaq">
+                        <TwitterShareButton url={`https://yaw.my.id/qris/${id}`} title={`QRIS ${qris.name}`}>
                           <TwitterIcon size={24} />
                         </TwitterShareButton>
                       </div>

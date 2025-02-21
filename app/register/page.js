@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -125,11 +126,12 @@ export default function RegisterPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <Card className="p-6 min-w-[300px] bg-bg">
-        <iframe
-          className="mt-3"
-          src="https://lottie.host/embed/adbec3f6-147c-45df-a800-c273bbf83def/qA0YvSLThJ.lottie"
-        ></iframe>
-        <span className=" flex justify-center caprasimo text-4xl mb-5">
+        <DotLottieReact
+          src="https://lottie.host/adbec3f6-147c-45df-a800-c273bbf83def/qA0YvSLThJ.lottie"
+          loop autoplay
+          className="w-72 p-[-10px] h-fit"
+        />
+        <span className=" flex justify-center caprasimo text-4xl my-5">
           yawmy
         </span>
         <div className="flex items-center justify-between">

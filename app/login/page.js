@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   signInWithPopup,
@@ -12,9 +12,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { CircleX, ShieldAlert } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [user, setUser] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -22,6 +25,18 @@ export default function LoginPage() {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
   const db = getFirestore(app);
+
+  const [message, setMessage] = useState(null);
+  const [nextPage, setNextPage] = useState(null);
+  
+  useEffect(() => {
+    console.log("searchParams", searchParams.get("message"));
+    let message = searchParams.get("message");
+    setMessage(message);
+    let nextPage = searchParams.get("next");
+    setNextPage(nextPage);
+
+  }, [searchParams]);
 
   const avatars = [
     { name: "Current", url: user?.photoURL },
@@ -131,7 +146,11 @@ const checkUserProfile = async (userData) => {
       if (docSnap.exists()) {
           console.log("Document data:", docSnap.data());
           console.log("Navigating to /...");
-          router.push("/");  // Debugging untuk memastikan ini dieksekusi
+          if (nextPage) {
+            router.push(`/${nextPage}`);
+          } else {
+            router.push("/");
+          }
       } else {
           console.log("No such document!");
           setUser(userData);
@@ -210,13 +229,23 @@ const checkUserProfile = async (userData) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <Card className="p-6 min-w-[300px] bg-bg">
-        <iframe
-          className="mt-3"
-          src="https://lottie.host/embed/adbec3f6-147c-45df-a800-c273bbf83def/qA0YvSLThJ.lottie"
-        ></iframe>
-        <span className=" flex justify-center caprasimo text-4xl mb-5">
+        <DotLottieReact
+          src="https://lottie.host/adbec3f6-147c-45df-a800-c273bbf83def/qA0YvSLThJ.lottie"
+          loop autoplay
+          className="w-72 p-[-10px] h-fit"
+        />
+        <span className=" flex justify-center caprasimo text-4xl my-5">
           yawmy
         </span>
+        {message && (
+          <div className="flex items-center bg-red-200 border-red-600 border p-2 rounded-base mb-5">
+            <ShieldAlert className="w-4 h-4 text-red-600" />
+            <span className=" w-full text-xs ml-1">
+              {message}
+            </span>
+            <CircleX className="w-4 h-4 text-red-600 ml-2 cursor-pointer" onClick={() => setMessage(null)} />
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">Login</h1>
           <span

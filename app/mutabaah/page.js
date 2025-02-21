@@ -32,10 +32,15 @@ export default function Mutabaah() {
   let [email, setEmail] = useState("");
   let [currentDate, setCurrentDate] = useState(new Date());
   let [firstDayOfWeek, setFirstDayOfWeek] = useState(0);
+
+  let [selectedDate, setSelectedDate] = useState(new Date());
+  let [currentWeek, setCurrentWeek] = useState([]);
+
   const { toast } = useToast();
 
   useEffect(() => {
     generateCurrentMonthArray();
+    generateCurrentWeekArray();
     getEmail();
     console.log(dateArray);
   }, []);
@@ -94,6 +99,25 @@ export default function Mutabaah() {
     setDateArray(monthArray);
   }
 
+  function generateCurrentWeekArray() {
+    let firstDay = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() - currentDate.getDay()
+    );
+    let lastDay = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() + (6 - currentDate.getDay())
+    );
+
+    let weekArray = [];
+    for (let i = firstDay; i <= lastDay; i.setDate(i.getDate() + 1)) {
+      weekArray.push(new Date(i));
+    }
+    setCurrentWeek(weekArray);
+  }
+
   function nextMonth() {
     setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)));
     generateCurrentMonthArray();
@@ -127,8 +151,8 @@ export default function Mutabaah() {
     try {
       const recordsRef = collection(db, `mutabaah/${email}/records`); // Reference to records subcollection
 
-      const startDate = "2025-02-01"; // Start date
-      const endDate = "2025-02-07"; // End date
+      const startDate = moment().subtract(7, 'd').format("yyyy-MM-dd") // "2025-02-01"; // Start date
+      const endDate = moment().format("yyyy-MM-dd"); // End date
 
       // Query: Get documents where the ID (date) is between 2025-02-01 and 2025-02-07
       const q = query(
@@ -241,6 +265,36 @@ export default function Mutabaah() {
             className=""
           />
         </div> */}
+      </div>
+      currentWeek
+      <div className="mt-4">
+        <span className="text-xl font-bold">Riwayat Mutabaah</span>
+        <p className="text-gray-600">
+          Mutabaah yang pernah diisi pada beberapa hari terakhir
+        </p>
+      </div>
+      <div className="flex justify-between items-center mt-4">
+        <div className=" flex justify-center items-center text-center bg-bg rounded-base border border-black">
+          <ChevronLeftIcon className="h-5 w-5" />
+        </div>
+        <div className="w-full mx-1 grid grid-cols-7 gap-1 py-2 rounded-base text-black">
+          {currentWeek.map((date, index) => (
+            <div key={index} className={
+              moment(date).format("YYYY-MM-DD") === moment(selectedDate).format("YYYY-MM-DD") 
+              ? "flex flex-col items-center my-1 bg-main rounded-base"
+              : "flex flex-col justify-center items-center my-1"
+            } onClick={() => setSelectedDate(date)}>
+              <span className="caprasimo text-2xl">{moment(date).format("DD")}</span>
+              <span>{dayInAWeek[index]}</span>
+            </div>
+          ))}
+        </div>
+        <div className=" flex justify-center items-center text-center bg-bg rounded-base border border-black">
+          <ChevronRightIcon className="h-5 w-5" />
+        </div>
+      </div>
+      <div>
+        
       </div>
 
       <div className="mt-4">
