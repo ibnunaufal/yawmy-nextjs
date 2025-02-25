@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
   signInWithPopup,
   GoogleAuthProvider,
@@ -16,6 +16,13 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { CircleX, ShieldAlert } from "lucide-react";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+const LoginContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -27,15 +34,13 @@ export default function LoginPage() {
   const db = getFirestore(app);
 
   const [message, setMessage] = useState(null);
-  const [nextPage, setNextPage] = useState(null);
-  
+  const [redirectPage, setRedirectPage] = useState(null);
+
   useEffect(() => {
-    console.log("searchParams", searchParams.get("message"));
     let message = searchParams.get("message");
     setMessage(message);
-    let nextPage = searchParams.get("next");
-    setNextPage(nextPage);
-
+    let redirectPage = searchParams.get("redirect");
+    setRedirectPage(redirectPage);
   }, [searchParams]);
 
   const avatars = [
@@ -84,83 +89,85 @@ export default function LoginPage() {
 
   const loginWithEmail = async () => {
     if (!username || !password) {
-        toast({
-            description: "Username dan Password tidak boleh kosong",
-        });
-        return;
+      toast({
+        description: "Username dan Password tidak boleh kosong",
+      });
+      return;
     }
 
     try {
-        const result = await signInWithEmailAndPassword(auth, username, password);
-        document.cookie = `authToken=${result.user.accessToken}; path=/`;
-        console.log("result", result);
-        const userData = {
-            name: result.user.displayName,
-            email: result.user.email,
-            photoURL: result.user.photoURL,
-        };
-        console.log("userData", userData);
+      const result = await signInWithEmailAndPassword(auth, username, password);
+      document.cookie = `authToken=${result.user.accessToken}; path=/`;
+      console.log("result", result);
+      const userData = {
+        name: result.user.displayName,
+        email: result.user.email,
+        photoURL: result.user.photoURL,
+      };
+      console.log("userData", userData);
 
-        await checkUserProfile(userData); // Tambahkan `await` agar diproses secara berurutan
+      await checkUserProfile(userData); // Tambahkan `await` agar diproses secara berurutan
     } catch (error) {
-        let errorMessage = "Terjadi kesalahan. Silakan coba lagi.";
+      let errorMessage = "Terjadi kesalahan. Silakan coba lagi.";
 
-        switch (error.code) {
-            case "auth/invalid-email":
-                errorMessage = "Format email tidak valid.";
-                break;
-            case "auth/user-disabled":
-                errorMessage = "Akun ini telah dinonaktifkan.";
-                break;
-            case "auth/user-not-found":
-                errorMessage = "Akun tidak ditemukan. Silakan daftar terlebih dahulu.";
-                break;
-            case "auth/email-already-in-use":
-                errorMessage = "Email sudah digunakan. Silakan gunakan email lain.";
-                break;
-            case "auth/invalid-credential":
-                errorMessage = "Email atau password tidak valid.";
-                break;
-            case "auth/wrong-password":
-                errorMessage = "Password yang dimasukkan salah.";
-                break;
-            case "auth/too-many-requests":
-                errorMessage = "Terlalu banyak percobaan login. Silakan coba lagi nanti.";
-                break;
-        }
+      switch (error.code) {
+        case "auth/invalid-email":
+          errorMessage = "Format email tidak valid.";
+          break;
+        case "auth/user-disabled":
+          errorMessage = "Akun ini telah dinonaktifkan.";
+          break;
+        case "auth/user-not-found":
+          errorMessage =
+            "Akun tidak ditemukan. Silakan daftar terlebih dahulu.";
+          break;
+        case "auth/email-already-in-use":
+          errorMessage = "Email sudah digunakan. Silakan gunakan email lain.";
+          break;
+        case "auth/invalid-credential":
+          errorMessage = "Email atau password tidak valid.";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Password yang dimasukkan salah.";
+          break;
+        case "auth/too-many-requests":
+          errorMessage =
+            "Terlalu banyak percobaan login. Silakan coba lagi nanti.";
+          break;
+      }
 
-        toast({
-            description: errorMessage,
-        });
+      toast({
+        description: errorMessage,
+      });
 
-        console.error("Login Gagal", error);
+      console.error("Login Gagal", error);
     }
-};
+  };
 
-const checkUserProfile = async (userData) => {
-  try {
+  const checkUserProfile = async (userData) => {
+    try {
       console.log("Checking user profile for", userData.email);
       const userDocRef = doc(db, "users", userData.email);
       const docSnap = await getDoc(userDocRef);
 
       if (docSnap.exists()) {
-          console.log("Document data:", docSnap.data());
-          console.log("Navigating to /...");
-          if (nextPage) {
-            router.push(`/${nextPage}`);
-          } else {
-            router.push("/");
-          }
+        console.log("Document data:", docSnap.data());
+        console.log("Navigating to /...");
+        if (redirectPage) {
+          router.push(`/${redirectPage}`);
+        } else {
+          router.push("/");
+        }
       } else {
-          console.log("No such document!");
-          setUser(userData);
-          setSelectedAvatar(userData.photoURL);
-          setShowConfirm(true);
+        console.log("No such document!");
+        setUser(userData);
+        setSelectedAvatar(userData.photoURL);
+        setShowConfirm(true);
       }
-  } catch (error) {
+    } catch (error) {
       console.error("Error getting document:", error);
-  }
-};
+    }
+  };
 
   // const checkUserProfile = async (userData) => {
   //   try {
@@ -231,7 +238,8 @@ const checkUserProfile = async (userData) => {
       <Card className="p-6 min-w-[300px] bg-bg">
         <DotLottieReact
           src="https://lottie.host/adbec3f6-147c-45df-a800-c273bbf83def/qA0YvSLThJ.lottie"
-          loop autoplay
+          loop
+          autoplay
           className="w-72 p-[-10px] h-fit"
         />
         <span className=" flex justify-center caprasimo text-4xl my-5">
@@ -240,10 +248,11 @@ const checkUserProfile = async (userData) => {
         {message && (
           <div className="flex items-center bg-red-200 border-red-600 border p-2 rounded-base mb-5">
             <ShieldAlert className="w-4 h-4 text-red-600" />
-            <span className=" w-full text-xs ml-1">
-              {message}
-            </span>
-            <CircleX className="w-4 h-4 text-red-600 ml-2 cursor-pointer" onClick={() => setMessage(null)} />
+            <span className=" w-full text-xs ml-1">{message}</span>
+            <CircleX
+              className="w-4 h-4 text-red-600 ml-2 cursor-pointer"
+              onClick={() => setMessage(null)}
+            />
           </div>
         )}
         <div className="flex items-center justify-between">

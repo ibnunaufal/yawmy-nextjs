@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="show"></div>
+    <script>
+      let show = document.getElementById("show");
+
+      let data = [];
+      // loop from 25 feb 2025 to 1 mei 2025
+      let currentDate = 1;
+
+      async function getHijri(gregdate) {
+        setTimeout(() => {
+          fetch(`https://api.aladhan.com/v1/gToH/${gregdate}`)
+            .then((res) => res.json())
+            .then((data) => {
+              let date = data.data.hijri.day;
+              let month = data.data.hijri.month.en;
+              let year = data.data.hijri.year;
+              console.log(`Hijri date is ${date} ${month} ${year}`);
+
+              let temp = {
+                gregorian: gregdate,
+                hijri: `${date} ${month} ${year}H`,
+              };
+              
+              show.innerHTML += `{gregorian: "${gregdate}", hijri: "${date} ${month} ${year}H"},`;
+              
+              currentDate++;
+              if (currentDate <= 31) {
+                getHijri(`${currentDate}-04-2025`);
+              }
+            });
+        }, 2000);
+        // delay
+      }
+
+      getHijri(`${currentDate}-04-2025`);
+
+    //   for (let i = 1; i <= 31; i++) {
+    //     let date = `${i}-03-2025`;
+    //     let hijri = getHijri(date);
+    //     // set delay 1 second
+    //   }
+    //   show.innerHTML = JSON.stringify(data, null, 2);
+    </script>
+  </body>
+</html>

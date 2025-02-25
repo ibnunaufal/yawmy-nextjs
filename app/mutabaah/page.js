@@ -16,25 +16,56 @@ import {
   orderBy,
   getDocs,
   doc,
+  getDoc,
 } from "firebase/firestore";
 import { auth } from "@/utils/auth";
 import db from "@/utils/firestore";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { SquarePen } from "lucide-react";
 
 export default function Mutabaah() {
   const router = useRouter();
   let dayInAWeek = ["Aha", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+  let dayInAWeekFull = [
+    "Ahad",
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu",
+  ];
 
   let [records, setRecords] = useState([]);
   let [fields, setFields] = useState([]);
   let [dates, setDates] = useState([]);
+  const percentage = 67;
 
   let [dateArray, setDateArray] = useState([]);
   let [email, setEmail] = useState("");
+  let [user, setUser] = useState({});
   let [currentDate, setCurrentDate] = useState(new Date());
   let [firstDayOfWeek, setFirstDayOfWeek] = useState(0);
 
   let [selectedDate, setSelectedDate] = useState(new Date());
+  let [selectedDateRecords, setSelectedDateRecords] = useState([]);
+  let [isLoading, setIsLoading] = useState(false);
+  let [isEmpty, setIsEmpty] = useState(false);
   let [currentWeek, setCurrentWeek] = useState([]);
+
+  let [percentageWajib, setPercentageWajib] = useState(0);
+  let [percentageRawatib, setPercentageRawatib] = useState(0);
+  let [percentageJamaah, setPercentageJamaah] = useState(0);
+  let [percentageSunnah, setPercentageSunnah] = useState(0);
+  let [percentageLainnya, setPercentageLainnya] = useState(0);
 
   const { toast } = useToast();
 
@@ -51,6 +82,8 @@ export default function Mutabaah() {
         console.log("User is signed in.");
         console.log(user.email);
         setEmail(user.email);
+        setUser(user);
+        getSelectedDateRecords(user.email, selectedDate);
       } else {
         console.log("No user is signed in.");
       }
@@ -118,6 +151,84 @@ export default function Mutabaah() {
     setCurrentWeek(weekArray);
   }
 
+  function getSelectedDateRecords(em, date) {
+    // get data from firestore
+    setIsLoading(true);
+    console.log(`mutabaah/${em}/records/${moment(date).format("YYYY-MM-DD")}`)
+    const docRef = doc(
+      db,
+      `mutabaah/${em}/records/${moment(date).format("YYYY-MM-DD")}`
+    );
+    getDoc(docRef)
+      .then((docSnap) => {
+        setIsLoading(false);
+        if (docSnap.exists()) {
+          console.log("Document data:", docSnap.data());
+          setSelectedDateRecords(docSnap.data().mutabaahData);
+          setIsEmpty(false);
+          console.log(docSnap.data().mutabaahData);
+
+          // count percentage
+          let totalWajib = 5;
+          let totalRawatib = 5;
+          let totalJamaah = 5;
+          let totalSunnah = 3;
+          let totalLainnya = 4;
+
+          let countWajib = 0;
+          let countRawatib = 0;
+          let countJamaah = 0;
+          let countSunnah = 0;
+          let countLainnya = 0;
+
+          if (docSnap.data().mutabaahData.subuh) countWajib++;
+          if (docSnap.data().mutabaahData.dhuhur) countWajib++;
+          if (docSnap.data().mutabaahData.ashar) countWajib++;
+          if (docSnap.data().mutabaahData.magrib) countWajib++;
+          if (docSnap.data().mutabaahData.isya) countWajib++;
+
+          if (docSnap.data().mutabaahData.subuh_rawatib) countRawatib++;
+          if (docSnap.data().mutabaahData.dhuhur_rawatib) countRawatib++;
+          if (docSnap.data().mutabaahData.ashar_rawatib) countRawatib++;
+          if (docSnap.data().mutabaahData.magrib_rawatib) countRawatib++;
+          if (docSnap.data().mutabaahData.isya_rawatib) countRawatib++;
+
+          if (docSnap.data().mutabaahData.subuh_jamaah) countJamaah++;
+          if (docSnap.data().mutabaahData.dhuhur_jamaah) countJamaah++;
+          if (docSnap.data().mutabaahData.ashar_jamaah) countJamaah++;
+          if (docSnap.data().mutabaahData.magrib_jamaah) countJamaah++;
+          if (docSnap.data().mutabaahData.isya_jamaah) countJamaah++;
+
+          if (docSnap.data().mutabaahData.qiyaamul_lail) countSunnah++;
+          if (docSnap.data().mutabaahData.dhuha) countSunnah++;
+          if (docSnap.data().mutabaahData.tarawih) countSunnah++;
+
+          if (docSnap.data().mutabaahData.infaq) countLainnya++;
+          if (docSnap.data().mutabaahData.tilawah) countLainnya++;
+          if (docSnap.data().mutabaahData.dzikir_pagi) countLainnya++;
+          if (docSnap.data().mutabaahData.dzikir_petang) countLainnya++;
+
+          setPercentageWajib((countWajib / totalWajib) * 100);
+          setPercentageRawatib((countRawatib / totalRawatib) * 100);
+          setPercentageJamaah((countJamaah / totalJamaah) * 100);
+          setPercentageSunnah(((countSunnah / totalSunnah) * 100).toFixed(1));
+          setPercentageLainnya(((countLainnya / totalLainnya) * 100).toFixed(1));
+          console.log("Percentage Wajib", percentageWajib);
+          console.log("Percentage Rawatib", percentageRawatib);
+          console.log("Percentage Jamaah", percentageJamaah);
+          console.log("Percentage Sunnah", percentageSunnah);
+          console.log("Percentage Lainnya", percentageLainnya);
+        } else {
+          setIsEmpty(true);
+          console.log("No such document!");
+        }
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        console.error("Error getting document:", error);
+      });
+  }
+
   function nextMonth() {
     setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)));
     generateCurrentMonthArray();
@@ -147,11 +258,35 @@ export default function Mutabaah() {
     router.push(`/mutabaah/${mutabaahDate}`);
   };
 
+  const handleDateClickWeek = (date) => {
+    console.log(date);
+    if (date.getMonth() !== currentDate.getMonth()) {
+      return;
+    }
+    let today = new Date();
+    if (date.getDate() > today.getDate()) {
+      console.log("tanggal belum bisa diisi");
+      toast({
+        description: `Tanggal ${date.getDate()} belum bisa diisi, pilih hari ini atau hari sebelumnya ya 😊`,
+        duration: 2000,
+      });
+      return;
+    }
+
+    setSelectedDate(date);
+    getSelectedDateRecords(user.email, date);
+  };
+
   async function getRecordsInRange() {
+    toast({
+      description: `Fitur ini masih dikembangin, mohon ditunggu ya 😊`,
+      duration: 2000,
+    });
+    return
     try {
       const recordsRef = collection(db, `mutabaah/${email}/records`); // Reference to records subcollection
 
-      const startDate = moment().subtract(7, 'd').format("yyyy-MM-dd") // "2025-02-01"; // Start date
+      const startDate = moment().subtract(7, "d").format("yyyy-MM-dd"); // "2025-02-01"; // Start date
       const endDate = moment().format("yyyy-MM-dd"); // End date
 
       // Query: Get documents where the ID (date) is between 2025-02-01 and 2025-02-07
@@ -174,11 +309,11 @@ export default function Mutabaah() {
         setFields(Object.keys(fetchedRecords[0]).filter((key) => key !== "id")); // Extract field names
       }
 
-      let tempDates = [...Array(7)].map((_, index) => 
+      let tempDates = [...Array(7)].map((_, index) =>
         moment().subtract(index, "days").format("YYYY-MM-DD")
       );
       setDates(tempDates.reverse());
-      
+
       setRecords(fetchedRecords);
 
       console.log("Dates:", dates);
@@ -214,11 +349,9 @@ export default function Mutabaah() {
           </button>
         </div> */}
       </div>
-
       <p className="text-gray-600">
         Pilih tanggal untuk mulai mengisi mutabaah
       </p>
-
       <div className="mb-8 mt-4">
         <div className="grid grid-cols-7 gap-1 py-2 rounded-base bg-main text-black border-2 border-black">
           {dayInAWeek.map((day, index) => (
@@ -266,47 +399,409 @@ export default function Mutabaah() {
           />
         </div> */}
       </div>
-      currentWeek
       <div className="mt-4">
         <span className="text-xl font-bold">Riwayat Mutabaah</span>
         <p className="text-gray-600">
           Mutabaah yang pernah diisi pada beberapa hari terakhir
         </p>
       </div>
-      <div className="flex justify-between items-center mt-4">
-        <div className=" flex justify-center items-center text-center bg-bg rounded-base border border-black">
+      <div className="flex justify-between items-center my-4">
+        {/* <div className=" flex justify-center items-center text-center bg-bg rounded-base border border-black">
           <ChevronLeftIcon className="h-5 w-5" />
-        </div>
+        </div> */}
         <div className="w-full mx-1 grid grid-cols-7 gap-1 py-2 rounded-base text-black">
           {currentWeek.map((date, index) => (
-            <div key={index} className={
-              moment(date).format("YYYY-MM-DD") === moment(selectedDate).format("YYYY-MM-DD") 
-              ? "flex flex-col items-center my-1 bg-main rounded-base"
-              : "flex flex-col justify-center items-center my-1"
-            } onClick={() => setSelectedDate(date)}>
-              <span className="caprasimo text-2xl">{moment(date).format("DD")}</span>
+            <div
+              key={index}
+              className={
+                moment(date).format("YYYY-MM-DD") ===
+                moment(selectedDate).format("YYYY-MM-DD")
+                  ? "flex flex-col items-center my-1 bg-main rounded-base"
+                  : "flex flex-col justify-center items-center my-1"
+              }
+              onClick={() => handleDateClickWeek(date)}
+            >
+              <span className="caprasimo text-2xl">
+                {moment(date).format("DD")}
+              </span>
               <span>{dayInAWeek[index]}</span>
             </div>
           ))}
         </div>
-        <div className=" flex justify-center items-center text-center bg-bg rounded-base border border-black">
+        {/* <div className=" flex justify-center items-center text-center bg-bg rounded-base border border-black">
           <ChevronRightIcon className="h-5 w-5" />
+        </div> */}
+      </div>
+      {isLoading ? (
+        <div>
+          Loading
         </div>
-      </div>
-      <div>
-        
-      </div>
+      ) : (
+        <div>
+          {!isEmpty ? (
+            <Card className="bg-bg">
+              <CardHeader>
+                <CardTitle>
+                  <div className="flex justify-between">
+                    <div className="flex flex-col items-start">
+                      <span className="text-xl font-bold">
+                        {dayInAWeekFull[moment(selectedDate).day()]},{" "}
+                        {moment(selectedDate).format("DD MMMM YYYY")}
+                      </span>
+                      <span className="text-gray-600 text-sm">
+                        {user.displayName} ({user.email})
+                      </span>
+                    </div>
+                    <div>
+                      <Button onClick={() => handleDateClick(selectedDate)}>
+                        <SquarePen/>
+                        Edit
+                        </Button>
+                    </div>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className=" my-6">
+                  <Accordion
+                    className="w-full lg:w-[unset]"
+                    type="single"
+                    collapsible
+                  >
+                    <AccordionItem
+                      className="lg:w-[500px] max-w-full"
+                      value="item-1"
+                    >
+                      <AccordionTrigger>Solat Wajib</AccordionTrigger>
+                      <AccordionContent>
+                        <div>
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="font-bold underline">
+                                Solat Wajib
+                              </span>
+                              <ul>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.subuh ? "✅" : "❌"}
+                                  </span>
+                                  Solat Subuh{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.dhuhur ? "✅" : "❌"}
+                                  </span>
+                                  Solat Dhuhur{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.ashar ? "✅" : "❌"}
+                                  </span>
+                                  Solat Ashar{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.magrib ? "✅" : "❌"}
+                                  </span>
+                                  Solat Maghrib{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.isya ? "✅" : "❌"}
+                                  </span>
+                                  Solat Isya{" "}
+                                </li>
+                              </ul>
+                            </div>
+                            <div className="w-24">
+                              <CircularProgressbar
+                                value={percentageWajib}
+                                text={`${percentageWajib}%`}
+                                background
+                                backgroundPadding={6}
+                                styles={buildStyles({
+                                  backgroundColor: "#FFAB5B",
+                                  textColor: "#000",
+                                  pathColor: "#fff",
+                                  trailColor: "transparent",
+                                })}
+                              />
+                            </div>
+                          </div>
+                          <hr className="my-4" />
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="font-bold underline">
+                                Solat Rawatib
+                              </span>
+                              <ul>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.subuh_rawatib
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Rawatib Subuh{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.dhuhur_rawatib
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Rawatib Dhuhur{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.ashar_rawatib
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Rawatib Ashar{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.magrib_rawatib
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Rawatib Maghrib{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.isya_rawatib
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Rawatib Isya{" "}
+                                </li>
+                              </ul>
+                            </div>
+                            <div className="w-24">
+                              <CircularProgressbar
+                                value={percentageRawatib}
+                                text={`${percentageRawatib}%`}
+                                background
+                                backgroundPadding={6}
+                                styles={buildStyles({
+                                  backgroundColor: "#FFAB5B",
+                                  textColor: "#000",
+                                  pathColor: "#fff",
+                                  trailColor: "transparent",
+                                })}
+                              />
+                            </div>
+                          </div>
+                          <hr className="my-4" />
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="font-bold underline">
+                                Solat Berjamaah
+                              </span>
+                              <ul>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.subuh_jamaah
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Subuh Berjamaah{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.dhuhur_jamaah
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Dhuhur Berjamaah{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.ashar_jamaah
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Ashar Berjamaah{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.magrib_jamaah
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Maghrib Berjamaah{" "}
+                                </li>
+                                <li>
+                                  <span className="mr-2">
+                                    {selectedDateRecords.isya_jamaah
+                                      ? "✅"
+                                      : "❌"}
+                                  </span>
+                                  Solat Isya Berjamaah{" "}
+                                </li>
+                              </ul>
+                            </div>
+                            <div className="w-24">
+                              <CircularProgressbar
+                                value={percentageJamaah}
+                                text={`${percentageJamaah}%`}
+                                background
+                                backgroundPadding={6}
+                                styles={buildStyles({
+                                  backgroundColor: "#FFAB5B",
+                                  textColor: "#000",
+                                  pathColor: "#fff",
+                                  trailColor: "transparent",
+                                })}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+                <div className="my-6">
+                  <Accordion
+                    className="w-full lg:w-[unset]"
+                    type="single"
+                    collapsible
+                  >
+                    <AccordionItem
+                      className="lg:w-[500px] max-w-full"
+                      value="item-1"
+                    >
+                      <AccordionTrigger>Solat Sunnah</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <ul>
+                              <li>
+                                <span className="mr-2">
+                                  {selectedDateRecords.qiyaamul_lail
+                                    ? "✅"
+                                    : "❌"}
+                                </span>
+                                Qiyamul Lail{" "}
+                              </li>
+                              <li>
+                                <span className="mr-2">
+                                  {selectedDateRecords.dhuha ? "✅" : "❌"}
+                                </span>
+                                Solat Dhuha{" "}
+                              </li>
+                              <li>
+                                <span className="mr-2">
+                                  {selectedDateRecords.tarawih ? "✅" : "❌"}
+                                </span>
+                                Solat Tarawih{" "}
+                              </li>
+                            </ul>
+                          </div>
+                          <div className="w-24">
+                            <CircularProgressbar
+                              value={percentageSunnah}
+                              text={`${percentageSunnah}%`}
+                              background
+                              backgroundPadding={6}
+                              styles={buildStyles({
+                                backgroundColor: "#FFAB5B",
+                                textColor: "#000",
+                                pathColor: "#fff",
+                                trailColor: "transparent",
+                              })}
+                            />
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+                <div className="my-6">
+                  <Accordion
+                    className="w-full lg:w-[unset]"
+                    type="single"
+                    collapsible
+                  >
+                    <AccordionItem
+                      className="lg:w-[500px] max-w-full"
+                      value="item-1"
+                    >
+                      <AccordionTrigger>Ibadah Lainnya</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <ul>
+                              <li>
+                                <span className="mr-2">
+                                  {selectedDateRecords.infaq ? "✅" : "❌"}
+                                </span>
+                                Infaq
+                              </li>
+                              <li>
+                                <span className="mr-2">
+                                  {selectedDateRecords.tilawah ? "✅" : "❌"}
+                                </span>
+                                Tilawah
+                              </li>
+                              <li>
+                                <span className="mr-2">
+                                  {selectedDateRecords.dzikir_pagi
+                                    ? "✅"
+                                    : "❌"}
+                                </span>
+                                Dzikir Pagi
+                              </li>
+                              <li>
+                                <span className="mr-2">
+                                  {selectedDateRecords.dzikir_petang
+                                    ? "✅"
+                                    : "❌"}
+                                </span>
+                                Dzikir Petang
+                              </li>
+                            </ul>
+                          </div>
+                          <div className="w-24">
+                            <CircularProgressbar
+                              value={percentageLainnya}
+                              text={`${percentageLainnya}%`}
+                              background
+                              backgroundPadding={6}
+                              styles={buildStyles({
+                                backgroundColor: "#FFAB5B",
+                                textColor: "#000",
+                                pathColor: "#fff",
+                                trailColor: "transparent",
+                              })}
+                            />
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="flex flex-col justify-center items-center my-10">
+              <span className="text-gray-600 my-2">Belum ada data mutabaah</span>
+              <Button>Isi Mutabaah</Button>
+            </div>
+          )}
+        </div>
+      )}
 
-      <div className="mt-4">
+      <div className="mt-8 pb-20">
         <span className="text-xl font-bold">Tabel Mutabaah</span>
         <p className="text-gray-600">
           Lihat mutabaah yang sudah diisi pada beberapa hari terakhir
         </p>
-        <Button onClick={() => getRecordsInRange()} className="mt-2">
+        <Button onClick={() => getRecordsInRange()} className="my-2">
           Tampilkan
         </Button>
       </div>
-      <div className="my-4 pb-4 overflow-x-auto" id="mutabaah-table">
+      <div className="my-4 pb-4 overflow-x-auto hidden" id="mutabaah-table">
         <div className="min-w-max">
           <table className="min-w-full border-collapse border border-gray-300">
             <thead>
@@ -341,7 +836,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("subuh") ? (record?.subuh ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("subuh")
+                        ? record?.subuh
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -354,7 +853,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("subuh_rawatib") ? (record?.subuh_rawatib ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("subuh_rawatib")
+                        ? record?.subuh_rawatib
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -367,7 +870,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("subuh_jamaah") ? (record?.subuh_jamaah ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("subuh_jamaah")
+                        ? record?.subuh_jamaah
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -382,7 +889,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("dhuhur") ? (record?.dhuhur ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("dhuhur")
+                        ? record?.dhuhur
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -395,7 +906,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("dhuhur_rawatib") ? (record?.dhuhur_rawatib ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("dhuhur_rawatib")
+                        ? record?.dhuhur_rawatib
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -408,7 +923,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("dhuhur_jamaah") ? (record?.dhuhur_jamaah ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("dhuhur_jamaah")
+                        ? record?.dhuhur_jamaah
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -423,7 +942,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("ashar") ? (record?.ashar ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("ashar")
+                        ? record?.ashar
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -436,7 +959,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("ashar_rawatib") ? (record?.ashar_rawatib ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("ashar_rawatib")
+                        ? record?.ashar_rawatib
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -449,7 +976,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("ashar_jamaah") ? (record?.ashar_jamaah ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("ashar_jamaah")
+                        ? record?.ashar_jamaah
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -464,7 +995,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("maghrib") ? (record?.maghrib ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("maghrib")
+                        ? record?.maghrib
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -477,7 +1012,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("maghrib_rawatib") ? (record?.maghrib_rawatib ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("maghrib_rawatib")
+                        ? record?.maghrib_rawatib
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -490,7 +1029,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("maghrib_jamaah") ? (record?.maghrib_jamaah ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("maghrib_jamaah")
+                        ? record?.maghrib_jamaah
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -505,7 +1048,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("isya") ? (record?.isya ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("isya")
+                        ? record?.isya
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -518,7 +1065,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("isya_rawatib") ? (record?.isya_rawatib ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("isya_rawatib")
+                        ? record?.isya_rawatib
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -531,7 +1082,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("isya_jamaah") ? (record?.isya_jamaah ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("isya_jamaah")
+                        ? record?.isya_jamaah
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -546,7 +1101,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("qiyamul_lail") ? (record?.qiyamul_lail ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("qiyaamul_lail")
+                        ? record?.qiyaamul_lail
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -561,7 +1120,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("dhuha") ? (record?.dhuha ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("dhuha")
+                        ? record?.dhuha
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -576,7 +1139,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("tarawih") ? (record?.tarawih ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("tarawih")
+                        ? record?.tarawih
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -591,7 +1158,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("infaq") ? (record?.infaq ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("infaq")
+                        ? record?.infaq
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -606,7 +1177,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("tilawah") ? (record?.tilawah ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("tilawah")
+                        ? record?.tilawah
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -621,7 +1196,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("puasa_sunnah") ? (record?.puasa_sunnah ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("puasa_sunnah")
+                        ? record?.puasa_sunnah
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -636,7 +1215,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("dzikir_pagi") ? (record?.dzikir_pagi ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("dzikir_pagi")
+                        ? record?.dzikir_pagi
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
@@ -651,7 +1234,11 @@ export default function Mutabaah() {
                   const record = records.find((rec) => rec.id === date);
                   return (
                     <td key={date} className="border border-gray-300 p-2">
-                      {record?.hasOwnProperty("dzikir_petang") ? (record?.dzikir_petang ? "✅" : "❌") : "⛔️"}
+                      {record?.hasOwnProperty("dzikir_petang")
+                        ? record?.dzikir_petang
+                          ? "✅"
+                          : "❌"
+                        : "⛔️"}
                     </td>
                   );
                 })}
