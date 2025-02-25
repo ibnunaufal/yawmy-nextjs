@@ -222,7 +222,7 @@ export default function RegisterPage() {
             {/* Avatar Selection */}
             <div className="grid grid-cols-5 gap-4 mt-2">
               {avatars.map((avatar) => (
-                <Avatar className={`w-16 h-16 rounded-full bg-customBlue cursor-pointer border-2 ${
+                <Avatar key={avatar.name} className={`w-16 h-16 rounded-full bg-customBlue cursor-pointer border-2 ${
                     selectedAvatar === avatar.url
                       ? "border-blue-500 border-2 shadow-lg shadow-black"
                       : "border-gray-200"

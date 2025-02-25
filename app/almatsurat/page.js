@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 export default function AlMatsuratPage() {
   const router = useRouter();
 
-  const [zikir, setZikir] = useState("kubro");
+  const [zikir, setZikir] = useState("sughro");
   const [isVisible, setIsVisible] = useState(false);
 
   const isBrowser = () => typeof window !== "undefined"; //The approach recommended by Next.js
@@ -81,6 +81,7 @@ export default function AlMatsuratPage() {
       <div className="pb-8">
         {zikir === "sughro" ? (
           <div>
+            <h2 className="text-xl font-bold">Al-Matsurat Sughro</h2>
             <div className="zikir-block">
               <div align="center">
                 <p lang="ar" className="text-quran taawudz">
@@ -1226,6 +1227,7 @@ export default function AlMatsuratPage() {
           </div>
         ) : (
           <div>
+            <h2 className="text-xl font-bold">Al-Matsurat Kubro</h2>
             <div className="zikir-block">
               <div align="center">
                 <p lang="ar" className="text-quran taawudz">

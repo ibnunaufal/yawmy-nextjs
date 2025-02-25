@@ -28,9 +28,16 @@ export default function ForgotPasswordPage() {
   const sendPasswordReset = async () => {
     try {
       await sendPasswordResetEmail(auth, username);
-      toast("Password reset email sent", "success");
+      toast({
+        description: "Email reset password telah dikirim",
+      });
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
     } catch (error) {
-      toast(error.message, "error");
+      toast({
+        description: error.message,
+      });
     }
   };
 

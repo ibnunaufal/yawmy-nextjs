@@ -27,6 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "embla-carousel-react": "^8.5.2",
     "firebase": "^11.2.0",
     "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.1.5",

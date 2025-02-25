@@ -2,6 +2,7 @@ import { Geist, Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Logo from "@/components/Logo";
 import { Toaster } from "@/components/ui/toaster";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +16,8 @@ const geistMono = Geist_Mono({
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
-  subsets: ["latin"]
-})
+  subsets: ["latin"],
+});
 export const metadata = {
   title: "Yawmy",
   description: "Yawmy is a platform for managing your daily activities.",
@@ -25,6 +26,36 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {process.env.NODE_ENV === "production" && (
+          <Script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-79VMVT7EPH"
+          ></Script>
+        )}
+        {process.env.NODE_ENV === "production" && (
+          <Script id="google-analytics">
+            {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag(' js', new Date());
+            gtag('config', 'G-79VMVT7EPH');
+          `}
+          </Script>
+        )}
+        {/* <Script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-79VMVT7EPH"
+          ></Script>
+        <Script id="google-analytics">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag(' js', new Date());
+            gtag('config', 'G-79VMVT7EPH');
+          `}
+        </Script> */}
+      </head>
       <body
         className={`${plusJakartaSans.variable} ${geistMono.variable} antialiased`}
       >
