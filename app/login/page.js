@@ -27,14 +27,14 @@ export default function LoginPage() {
   const db = getFirestore(app);
 
   const [message, setMessage] = useState(null);
-  const [nextPage, setNextPage] = useState(null);
+  const [redirectPage, setRedirectPage] = useState(null);
   
   useEffect(() => {
     console.log("searchParams", searchParams.get("message"));
     let message = searchParams.get("message");
     setMessage(message);
-    let nextPage = searchParams.get("next");
-    setNextPage(nextPage);
+    let redirectPage = searchParams.get("redirect");
+    setRedirectPage(redirectPage);
 
   }, [searchParams]);
 
@@ -146,8 +146,8 @@ const checkUserProfile = async (userData) => {
       if (docSnap.exists()) {
           console.log("Document data:", docSnap.data());
           console.log("Navigating to /...");
-          if (nextPage) {
-            router.push(`/${nextPage}`);
+          if (redirectPage) {
+            router.push(`/${redirectPage}`);
           } else {
             router.push("/");
           }

@@ -11,9 +11,11 @@ import {
   HandCoins,
   Lightbulb,
   ListChecks,
+  Menu,
   MessageCircleQuestion,
   NotebookPen,
   Scroll,
+  Sun,
   User,
 } from "lucide-react";
 import moment from "moment";
@@ -38,9 +40,9 @@ export default function HomePage() {
       icon: <BookOpenText />,
     },
     {
-      name: "Profile",
-      href: "/profile",
-      icon: <User />,
+      name: "Matsurat",
+      href: "/almatsurat",
+      icon: <Sun />,
     },
   ];
 
@@ -67,11 +69,11 @@ export default function HomePage() {
       icon: <BookOpenText size={54} />,
     },
     {
-      title: "Profile",
+      title: "Al-Matsurat",
       description:
-        "Profile adalah halaman untuk melihat dan mengubah data diri.",
-      href: "/profile",
-      icon: <User size={54} />,
+        "Al-Matsurat adalah kumpulan dzikir pagi dan petang yang disusun oleh Imam Hasan Al-Banna, berisi ayat-ayat Al-Qur’an dan hadits. Dzikir ini dianjurkan untuk diamalkan setiap hari sebagai bentuk mengingat Allah dan memohon perlindungan-Nya.",
+      href: "/almatsurat",
+      icon: <Sun size={54} />,
     },
   ];
 
@@ -101,6 +103,13 @@ export default function HomePage() {
           <span className=" text-lg caprasimo">yawmy</span>
         </div>
         <div>
+          <Menu />
+        </div>
+      </div>
+
+      {/* welcome section */}
+      <div className=" flex items-center rounded-md my-10">
+        <div>
           <Avatar>
             <AvatarImage src={user.photoURL} />
             <AvatarFallback>
@@ -108,68 +117,45 @@ export default function HomePage() {
             </AvatarFallback>
           </Avatar>
         </div>
-      </div>
-
-      {/* date and fill today's mutabaah */}
-      <div className=" flex justify-between bg-card-gradient rounded-md p-4 my-5 border-2 border-black">
-        <div>
+        <div className="ml-3">
           <h6 className=" text-sm font-normal">Assalamualaikum 👋</h6>
           <h1 className=" text-xl caprasimo">{user.displayName}</h1>
         </div>
-        <div className=" flex items-center justify-center flex-col">
-          <h2 className="text-md text-background font-bold mb-1">
-            {moment().format("dddd, D MMM YYYY")}
-          </h2>
-          <Button>Isi mutabaah hari ini</Button>
-        </div>
+      </div>
+
+      {/* date and fill today's mutabaah */}
+      <div className=" flex flex-col">
+        <h2 className="text-md text-background font-bold mb-1">
+          {moment().format("dddd, D MMM YYYY")}
+        </h2>
+        <Button
+          onClick={() => {
+            router.push(`/mutabaah/${moment().format("yyyy-MM-DD")}`);
+          }}
+        >
+          Isi mutabaah hari ini
+        </Button>
       </div>
 
       {/* menu */}
       <div className="my-5">
-        <div className="w-fit bg-bg py-1 px-5 border-black border-t-2 border-x-2 rounded-t-base flex items-center font-bold">
-          <Scroll className="mr-2 w-5 h-5" />
-          Menu
-        </div>
-        <div className="bg-main p-4 rounded-r-base rounded-b-base border-2 border-black">
-          <div className="grid grid-cols-4 gap-4">
+        <div className="w-fit py-1   flex items-center font-bold">Menu</div>
+        <div className="p-1">
+          <div className="grid grid-cols-2 md:grid-cols-4">
             {menu.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
                 className="
-                flex flex-col items-center justify-center bg-bg p-4 rounded-md
+                flex flex-col items-center justify-center bg-bg p-2 m-2 rounded-md
                 border-2 border-black
                 "
               >
                 {item.icon}
-                <span className="text-sm">{item.name}</span>
+                <span className="text-sm mt-1">{item.name}</span>
               </a>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* menu */}
-      <div className="my-5">
-        <div className="w-fit bg-main py-1 px-5 border-black border-t-2 border-x-2 rounded-t-base flex items-center font-bold">
-          <NotebookPen className="mr-2 w-5 h-5" />
-          Contribute
-        </div>
-        <div className="bg-bg p-4 rounded-r-base rounded-b-base border-2 border-black">
-          <span className="text-sm">
-            Unggah QRIS infaq yang anda temui atau miliki, dengan begitu orang
-            lain akan berinfaq lalu anda akan berpotensi mendapat pahala
-            jariyah!{" "}
-          </span>
-          <Button
-            className="mt-2"
-            onClick={() => {
-              router.push("/contribute");
-            }}
-          >
-            <CloudUpload className="mr-1 w-5 h-5" />
-            Unggah QRIS
-          </Button>
         </div>
       </div>
 
@@ -192,6 +178,49 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* app explanation */}
+      <div className="my-5">
+        <div className="w-fit bg-bg py-1 px-5 border-black border-t-2 border-x-2 rounded-t-base flex items-center font-bold">
+          <Lightbulb className="mr-2 w-5 h-5" />
+          Apa itu Yawmy?
+        </div>
+        <div className="bg-bg p-4 rounded-r-base rounded-b-base border-2 border-black">
+          <span className="text-sm">
+            Yawmy (dibaca Yaumi) berasal dari istilah Mutaba’ah Yaumiyyah, yang
+            berarti evaluasi amal harian—baik yang wajib maupun sunnah. Dengan
+            Yawmy, Anda dapat merefleksikan ibadah harian dan lebih mudah
+            mengamati perkembangan spiritual Anda. Aplikasi ini hadir sebagai
+            sahabat dalam perjalanan meningkatkan kualitas iman, membantu Anda
+            lebih konsisten dalam beribadah, dan mendekatkan diri kepada Allah.
+            Mari jadikan setiap hari lebih bermakna dengan Yawmy!
+          </span>
+        </div>
+      </div>
+
+      {/* contribute */}
+      <div className="my-5">
+        <div className="w-fit bg-main py-1 px-5 border-black border-t-2 border-x-2 rounded-t-base flex items-center font-bold">
+          <NotebookPen className="mr-2 w-5 h-5" />
+          Contribute
+        </div>
+        <div className="bg-bg p-4 rounded-r-base rounded-b-base border-2 border-black">
+          <span className="text-sm">
+            Unggah QRIS infaq yang anda temui atau miliki, dengan begitu orang
+            lain akan berinfaq lalu anda akan berpotensi mendapat pahala
+            jariyah!{" "}
+          </span>
+          <Button
+            className="mt-2"
+            onClick={() => {
+              router.push("/contribute");
+            }}
+          >
+            <CloudUpload className="mr-1 w-5 h-5" />
+            Unggah QRIS
+          </Button>
         </div>
       </div>
 
@@ -224,9 +253,7 @@ export default function HomePage() {
         <div>
           <Avatar>
             <AvatarImage src={""} />
-            <AvatarFallback>
-              hai
-            </AvatarFallback>
+            <AvatarFallback>hai</AvatarFallback>
           </Avatar>
         </div>
       </div>

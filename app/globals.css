@@ -33,6 +33,8 @@
   --heading-font-weight: 700;
 
   --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
+
+  scroll-behavior: smooth;
 }
 
 .dark {
@@ -46,6 +48,7 @@
   --ring-offset: #000;
 
   --shadow: var(--box-shadow-x) var(--box-shadow-y) 0px 0px var(--border);
+  scroll-behavior: smooth;
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -80,6 +83,26 @@ body {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+}
+.zikir-block {
+}
+.text-quran {
+  @apply text-2xl my-1
+}
+.ayat-block {
+  @apply w-fit p-1 rounded-base border-2 border-black
+}
+.ayat {
+  @apply text-xs
+}
+.title-block {
+  @apply bg-main border-2 w-fit rounded-base p-1 my-1 shadow-lg text-sm border-black font-bold
+}
+.taawudz {
+  @apply mt-8
+}
+.taawudz-translate {
+  @apply mb-8
 }
 /* @layer base {
   :root {

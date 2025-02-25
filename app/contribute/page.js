@@ -107,7 +107,7 @@ export default function ContributePage() {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (!user) {
-        router.push("/login");
+        router.push("/login?message=Silahkan login terlebih dahulu&redirect=contribute");
       } else {
         let uploader = user.displayName + "|" + user.email;
         setFormData({ ...formData, uploader: uploader });
