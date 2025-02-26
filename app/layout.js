@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {process.env.NODE_ENV === "production" && (
+        {/* {process.env.NODE_ENV === "production" && (
           <Script
             async
             src="https://www.googletagmanager.com/gtag/js?id=G-79VMVT7EPH"
@@ -42,8 +42,8 @@ export default function RootLayout({ children }) {
             gtag('config', 'G-79VMVT7EPH');
           `}
           </Script>
-        )}
-        {/* <Script
+        )} */}
+        <Script
             async
             src="https://www.googletagmanager.com/gtag/js?id=G-79VMVT7EPH"
           ></Script>
@@ -54,7 +54,7 @@ export default function RootLayout({ children }) {
             gtag(' js', new Date());
             gtag('config', 'G-79VMVT7EPH');
           `}
-        </Script> */}
+        </Script>
       </head>
       <body
         className={`${plusJakartaSans.variable} ${geistMono.variable} antialiased`}
