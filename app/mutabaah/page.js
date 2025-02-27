@@ -67,6 +67,7 @@ export default function Mutabaah() {
   let [percentageSunnah, setPercentageSunnah] = useState(0);
   let [percentageLainnya, setPercentageLainnya] = useState(0);
 
+  let [finishedDates, setFinishedDates] = useState([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -76,6 +77,22 @@ export default function Mutabaah() {
     console.log(dateArray);
   }, []);
 
+  async function getFinishedDates(em) {
+    try {
+      const month = moment().format("YYYY-MM");
+      const docRef = doc(db, `mutabaah/${em}/monthly/${month}`);
+      const docSnap = await getDoc(docRef);
+      console.log("Document data:", docSnap.data());
+      if (docSnap.exists()) {
+        setFinishedDates(docSnap.data().finishedDates);
+      } else {
+        console.log("No such document!");
+      }
+    } catch (error) {
+      console.error("Error getting document:", error);
+    }
+  }
+
   function getEmail() {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -84,7 +101,9 @@ export default function Mutabaah() {
         setEmail(user.email);
         setUser(user);
         getSelectedDateRecords(user.email, selectedDate);
+        getFinishedDates(user.email);
       } else {
+        setIsEmpty(true);
         console.log("No user is signed in.");
       }
     });
@@ -154,7 +173,7 @@ export default function Mutabaah() {
   function getSelectedDateRecords(em, date) {
     // get data from firestore
     setIsLoading(true);
-    console.log(`mutabaah/${em}/records/${moment(date).format("YYYY-MM-DD")}`)
+    console.log(`mutabaah/${em}/records/${moment(date).format("YYYY-MM-DD")}`);
     const docRef = doc(
       db,
       `mutabaah/${em}/records/${moment(date).format("YYYY-MM-DD")}`
@@ -212,7 +231,9 @@ export default function Mutabaah() {
           setPercentageRawatib((countRawatib / totalRawatib) * 100);
           setPercentageJamaah((countJamaah / totalJamaah) * 100);
           setPercentageSunnah(((countSunnah / totalSunnah) * 100).toFixed(1));
-          setPercentageLainnya(((countLainnya / totalLainnya) * 100).toFixed(1));
+          setPercentageLainnya(
+            ((countLainnya / totalLainnya) * 100).toFixed(1)
+          );
           console.log("Percentage Wajib", percentageWajib);
           console.log("Percentage Rawatib", percentageRawatib);
           console.log("Percentage Jamaah", percentageJamaah);
@@ -282,7 +303,7 @@ export default function Mutabaah() {
       description: `Fitur ini masih dikembangin, mohon ditunggu ya 😊`,
       duration: 2000,
     });
-    return
+    return;
     try {
       const recordsRef = collection(db, `mutabaah/${email}/records`); // Reference to records subcollection
 
@@ -355,7 +376,7 @@ export default function Mutabaah() {
       <div className="mb-8 mt-4">
         <div className="grid grid-cols-7 gap-1 py-2 rounded-base bg-main text-black border-2 border-black">
           {dayInAWeek.map((day, index) => (
-            <div key={index} className="text-center w-full">
+            <div key={index} className="text-center font-bold w-full">
               {day}
             </div>
           ))}
@@ -380,10 +401,10 @@ export default function Mutabaah() {
               >
                 {date.getDate()}
               </span>
-              <span className={"text-xs min-h-10"}>
+              <span className={"text-sm min-h-10"}>
                 {date.getMonth() === currentDate.getMonth() &&
-                date.getDay() % 2 == 0
-                  ? ""
+                finishedDates.includes(moment(date).format("YYYY-MM-DD"))
+                  ? "✅"
                   : ""}
               </span>
             </div>
@@ -417,7 +438,7 @@ export default function Mutabaah() {
                 moment(date).format("YYYY-MM-DD") ===
                 moment(selectedDate).format("YYYY-MM-DD")
                   ? "flex flex-col items-center my-1 bg-main rounded-base"
-                  : "flex flex-col justify-center items-center my-1"
+                  : "flex flex-col justify-center items-center my-1 text-gray-600"
               }
               onClick={() => handleDateClickWeek(date)}
             >
@@ -433,9 +454,7 @@ export default function Mutabaah() {
         </div> */}
       </div>
       {isLoading ? (
-        <div>
-          Loading
-        </div>
+        <div>Loading</div>
       ) : (
         <div>
           {!isEmpty ? (
@@ -452,12 +471,6 @@ export default function Mutabaah() {
                         {user.displayName} ({user.email})
                       </span>
                     </div>
-                    <div>
-                      <Button onClick={() => handleDateClick(selectedDate)}>
-                        <SquarePen/>
-                        Edit
-                        </Button>
-                    </div>
                   </div>
                 </CardTitle>
               </CardHeader>
@@ -467,6 +480,7 @@ export default function Mutabaah() {
                     className="w-full lg:w-[unset]"
                     type="single"
                     collapsible
+                    defaultValue="item-1"
                   >
                     <AccordionItem
                       className="lg:w-[500px] max-w-full"
@@ -666,6 +680,7 @@ export default function Mutabaah() {
                     className="w-full lg:w-[unset]"
                     type="single"
                     collapsible
+                    defaultValue="item-1"
                   >
                     <AccordionItem
                       className="lg:w-[500px] max-w-full"
@@ -722,6 +737,7 @@ export default function Mutabaah() {
                     className="w-full lg:w-[unset]"
                     type="single"
                     collapsible
+                    defaultValue="item-1"
                   >
                     <AccordionItem
                       className="lg:w-[500px] max-w-full"
@@ -781,12 +797,26 @@ export default function Mutabaah() {
                     </AccordionItem>
                   </Accordion>
                 </div>
+                <div>
+                  <Button onClick={() => handleDateClick(selectedDate)} className="bg-white">
+                    <SquarePen />
+                    Edit Mutabaah
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
             <div className="flex flex-col justify-center items-center my-10">
-              <span className="text-gray-600 my-2">Belum ada data mutabaah</span>
-              <Button>Isi Mutabaah</Button>
+              <span className="text-gray-600 my-2">
+                Belum ada data mutabaah
+              </span>
+              <Button
+                onClick={() =>
+                  router.push(`/mutabaah/${moment().format("yyyy-MM-DD")}`)
+                }
+              >
+                Isi Mutabaah
+              </Button>
             </div>
           )}
         </div>

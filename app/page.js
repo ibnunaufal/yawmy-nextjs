@@ -11,6 +11,7 @@ import {
   HandCoins,
   Lightbulb,
   ListChecks,
+  MapPinned,
   Menu,
   MessageCircleQuestion,
   NotebookPen,
@@ -113,12 +114,12 @@ export default function Home() {
       if (!authUser) {
         // router.push("/login");
       } else {
-        console.log(JSON.stringify(authUser));
+        // console.log(JSON.stringify(authUser));
         setUser(authUser);
       }
     });
     getNextPrayer();
-    console.log(JSON.stringify(user));
+    // console.log(JSON.stringify(user));
     return () => unsubscribe();
   }, []);
 
@@ -129,9 +130,9 @@ export default function Home() {
 
   function getNextPrayer() {
     let prayerTimes = JadwalSholat[moment().format("yyyy-MM-DD")];
-    console.log(prayerTimes);
+    // console.log(prayerTimes);
     if (!prayerTimes) {
-      console.log("No prayer times found for this date.");
+      // console.log("No prayer times found for this date.");
     }
     const now = new Date();
     const currentHours = now.getHours();
@@ -149,7 +150,7 @@ export default function Home() {
 
       const [hours, minutes] = prayerTimes[prayer].split(":").map(Number);
       const prayerTime = hours * 60 + minutes; // Convert to total minutes
-      console.log(prayerTime, currentTime, prayerTime - currentTime);
+      // console.log(prayerTime, currentTime, prayerTime - currentTime);
       if (
         prayerTime > currentTime &&
         prayerTime - currentTime < minDifference
@@ -163,15 +164,15 @@ export default function Home() {
 
         if (nextPrayer) {
           if (hourDifference < 1) {
-            setNextPrayer(`${minDifference} menit`);
+            setNextPrayer(`${minDifference} menit lagi`);
           } else {
             setNextPrayer(`${hourDifference} jam ${tempMinute} menit`);
           }
-          console.log("Next prayer is", nextPrayer, "at", nextPrayerName);
+          // console.log("Next prayer is", nextPrayer, "at", nextPrayerName);
           setNextPrayerTime(nextPrayer);
           setNextPrayerName(nextPrayerName);
         } else {
-          console.log("No prayer found for today.");
+          // console.log("No prayer found for today.");
         }
       }
     });
@@ -218,13 +219,13 @@ export default function Home() {
                     ))}
                     <hr className="w-full my-5" />
                     <Button
-                        onClick={() => {
-                          router.push("/contribute");
-                        }}
-                        className="bg-white w-full mb-4"
-                      >
-                        Upload QRIS
-                      </Button>
+                      onClick={() => {
+                        router.push("/contribute");
+                      }}
+                      className="bg-white w-full mb-4"
+                    >
+                      Upload QRIS
+                    </Button>
                     <hr className="w-full mt-5" />
                     <Button className="mt-5" onClick={handleLogout}>
                       Logout
@@ -285,27 +286,30 @@ export default function Home() {
           <h2 className="text-sm mb-1">
             {Hijriah1446.map((item) => {
               if (item.gregorian === moment().format("DD-MM-YYYY")) {
-                return (
-                  <span key={item.hijri}>
-                    {item.hijri}
-                  </span>
-                );
+                return <span key={item.hijri}>{item.hijri}</span>;
               }
             })}
           </h2>
         </div>
+        <div className="flex flex-col items-center">
         <Button
           onClick={() => {
             router.push(`/mutabaah/${moment().format("yyyy-MM-DD")}`);
           }}
+          className="text-xs"
         >
           Isi mutabaah hari ini
         </Button>
+        <a href="#insight" className="mt-2">
+        <span className="text-xs underline">Apa itu mutabaah?</span>
+        </a>
+        </div>
       </div>
       {nextPrayerTime && (
-        <div className="flex items-center w-full justify-between bg-bg px-2 pt-2 border-black border-2 rounded-base">
+        <div>
+          <div className="flex items-center w-full justify-between bg-bg px-2 pt-2 border-black border-2 rounded-r-base rounded-t-base">
           <div className="flex flex-col">
-            <span className="text-sm">Waktu solat terdekat</span>
+            <span className="text-xs">Waktu solat terdekat</span>
             <span>
               {nextPrayerName.toUpperCase()} at {nextPrayerTime}
             </span>
@@ -325,6 +329,8 @@ export default function Home() {
             height={100}
             className=""
           />
+        </div>
+        <span className="text-sm py-1 border-b-2 border-r-2 border-l-2 rounded-b-base w-fit px-2 pb-1 flex items-center"> <MapPinned size={18} className="mr-2" /> Kota Semarang</span>
         </div>
       )}
 
@@ -351,42 +357,46 @@ export default function Home() {
       </div>
 
       {/* insight */}
-      <div className="my-5">
-        <div className="w-fit py-1   flex items-center font-bold">Insight</div>
-        <Carousel className="p-1">
-          <CarouselContent>
-            {carousels.map((c) => (
-              <CarouselItem key={c.id}>
-                <div
-                  key={c.title}
-                  className="bg-white text-background w-fit min-w-64 min-h-56 mx-2 p-2 rounded-md border-2 border-black flex flex-col items-center"
-                >
-                  <div className="w-48 h-24 flex items-center justify-center">
-                    {c.icon}
-                  </div>
-                  <div className="text-xl font-caprasimo ">{c.title}</div>
-                  <div className="text-xs text-center">{c.description}</div>
-                </div>
-                <div className="flex justify-center">
-                  {/* indicator */}
-                  {
-                    <div className="flex mt-2">
-                      {carousels.map((_, index) => (
-                        <div
-                          key={index}
-                          className={`w-2 h-2 mx-1 rounded-full bg-background ${
-                            index === c.id - 1 ? "bg-main" : "bg-black"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  }
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
+      <div className="my-5" id="insight">
+        <div className="w-fit py-1 flex items-center font-bold">
+          Insight
+        </div>
       </div>
+      <Carousel className="p-1">
+        <CarouselContent>
+          {carousels.map((c) => (
+            <CarouselItem key={c.id}>
+              <div
+                key={c.title}
+                className="bg-white text-background w-fit min-w-64 min-h-56 mx-2 p-2 rounded-md border-2 border-black flex flex-col items-center"
+              >
+                <div className="w-48 h-24 flex items-center justify-center">
+                  {c.icon}
+                </div>
+                <div className="text-xl font-caprasimo ">{c.title}</div>
+                <div className="text-xs text-center">{c.description}</div>
+              </div>
+              <div className="flex justify-center">
+                {/* indicator */}
+                {
+                  <div className="flex mt-2">
+                    {carousels.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-2 h-2 mx-1 rounded-full bg-background ${
+                          index === c.id - 1 ? "bg-main" : "bg-black"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                }
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+      <CarouselNext />
+      </Carousel>
 
       {/* app explanation */}
       <div className="my-5">
@@ -395,7 +405,7 @@ export default function Home() {
           Apa itu Yawmy?
         </div>
         <div className="bg-bg p-4 rounded-r-base rounded-b-base border-2 border-black">
-          <span className="text-sm">
+          <p className="text-sm text-justify">
             Yawmy (dibaca Yaumi) berasal dari istilah Mutaba’ah Yaumiyyah, yang
             berarti evaluasi amal harian—baik yang wajib maupun sunnah. Dengan
             Yawmy, Anda dapat merefleksikan ibadah harian dan lebih mudah
@@ -403,7 +413,7 @@ export default function Home() {
             sahabat dalam perjalanan meningkatkan kualitas iman, membantu Anda
             lebih konsisten dalam beribadah, dan mendekatkan diri kepada Allah.
             Mari jadikan setiap hari lebih bermakna dengan Yawmy!
-          </span>
+          </p>
         </div>
       </div>
 
@@ -414,11 +424,12 @@ export default function Home() {
           Contribute
         </div>
         <div className="bg-bg p-4 rounded-r-base rounded-b-base border-2 border-black">
-          <span className="text-sm">
+          <p className="text-sm text-justify">
             Unggah QRIS infaq yang anda temui atau miliki, dengan begitu orang
             lain akan berinfaq lalu anda akan berpotensi mendapat pahala
-            jariyah!{" "}
-          </span>
+            jariyah!😉{" "}
+          </p>
+          <br/>
           <Button
             className="mt-2"
             onClick={() => {

@@ -44,9 +44,9 @@ export default function RootLayout({ children }) {
           </Script>
         )} */}
         <Script
-            async
-            src="https://www.googletagmanager.com/gtag/js?id=G-79VMVT7EPH"
-          ></Script>
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-79VMVT7EPH"
+        ></Script>
         <Script id="google-analytics">
           {`
             window.dataLayer = window.dataLayer || [];

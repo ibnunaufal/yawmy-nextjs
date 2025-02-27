@@ -81,7 +81,6 @@ export default function EvaluatePage() {
   const [currentEmail, setCurrentEmail] = useState("");
 
   const [lastFewDays, setLastFewDays] = useState([]);
-  
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
@@ -185,11 +184,38 @@ export default function EvaluatePage() {
     console.log(mutabaah);
     saveMutabaah(currentEmail, id, mutabaah).then((res) => {
       if (res.success) {
-        router.push("/mutabaah");
+        saveFinishedDate(currentEmail, id).then(() => {
+          router.push("/mutabaah");
+        });
       }
     });
   };
 
+  async function saveFinishedDate(email, date) {
+    // save the date to the user's record
+    // month format: 2021-09
+    // finishedDates: [2021-09-01, 2021-09-02, 2021-09-03]
+    // mutabaah/{email}/monthly/{month}/finishedDates
+    try {
+      const today = moment(Date.now()).format("YYYY-MM-DD");
+      const month = moment(date).format("YYYY-MM");
+      const docRef = doc(db, `mutabaah/${email}/monthly/${month}`);
+      // Fetch the existing document
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        // Update the document
+        const finishedDates = docSnap.data().finishedDates;
+        finishedDates.push(today);
+        await setDoc(docRef, { finishedDates }, { merge: true });
+        console.log("Document updated with ID: ", docSnap.id);
+      } else {
+        // Create the document
+        const finishedDates = [today];
+        await setDoc(docRef, { finishedDates });
+        console.log("Document created with ID: ", docRef.id);
+      }
+    } catch (error) {}
+  }
   async function saveMutabaah(email, date, mutabaahData) {
     try {
       const docRef = doc(db, `mutabaah/${email}/records/${date}`);
@@ -630,9 +656,9 @@ export default function EvaluatePage() {
         </Card>
 
         <div className="bg-bg p-2 border-2 border-black rounded-base flex justify-between items-center">
-          <span>Kalau sudah klik simpan ya!</span>
+          <span className="text-sm">Kalau sudah klik simpan ya!</span>
           <Button type="submit">Simpan</Button>
-          <Drawer>
+          {/* <Drawer>
             <DrawerTrigger asChild>
               <Button>Open</Button>
             </DrawerTrigger>
@@ -654,7 +680,7 @@ export default function EvaluatePage() {
                 </DrawerFooter>
               </div>
             </DrawerContent>
-          </Drawer>
+          </Drawer> */}
         </div>
       </form>
     </div>
