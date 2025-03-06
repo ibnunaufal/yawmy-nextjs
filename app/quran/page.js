@@ -189,6 +189,9 @@ export default function Quran() {
                       <p className="text-lg text-textColorPrimary">
                         Juz {juz.juz}
                       </p>
+                      <p className="text-xs text-textColorPrimary">
+                        Page {juz.start.page} - {juz.end.page}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center">
