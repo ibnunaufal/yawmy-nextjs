@@ -112,7 +112,7 @@ export default function QuranPage({ params }) {
     <div className="h-screen py-2">
       <div className=" h-5/6">
         <img
-          src={`https://quranimage.sgp1.digitaloceanspaces.com/QK_${getStringPage(
+          src={`https://quranimage.sgp1.cdn.digitaloceanspaces.com/QK_${getStringPage(
             id
           )}.webp`}
           alt={`Quran page ${getStringPage(id)}`}
