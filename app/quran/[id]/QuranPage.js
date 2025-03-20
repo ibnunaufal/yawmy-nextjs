@@ -5,7 +5,14 @@ import clsx from "clsx";
 import { use, useEffect, useState } from "react";
 import JuzList from "@/app/JuzList";
 import SurahList from "@/app/SurahList";
-import { ChevronLeft, ChevronRight, Home, Menu, Search } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  Menu,
+  Search,
+  Share,
+} from "lucide-react";
 import {
   Drawer,
   DrawerClose,
@@ -17,7 +24,21 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Progress } from "@/components/ui/progress";
-
+import {
+  FacebookIcon,
+  FacebookShareButton,
+  TelegramIcon,
+  TelegramShareButton,
+  TwitterIcon,
+  TwitterShareButton,
+  WhatsappIcon,
+  WhatsappShareButton,
+} from "react-share";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 const searchType = [
   { id: 1, name: "Berdasarkan Juz" },
   { id: 2, name: "Berdasarkan Nama Surah" },
@@ -179,20 +200,61 @@ export default function QuranPage({ id }) {
                       <Progress value={progressQuran} />
                     </div>
                     <div className="my-2">
-                      <span className="text-sm/6">
-                        Navigasi
-                      </span>
+                      <span className="text-sm/6">Navigasi</span>
                       <div className="mt-1">
                         <Button onClick={handleSearch} className="w-full">
                           <Search size={24} />
                           Pencarian
-                          </Button>
+                        </Button>
                       </div>
                       <div className="mt-3">
                         <Button onClick={handleGoHome} className="w-full">
                           <Home size={24} />
                           Home
-                          </Button>
+                        </Button>
+                      </div>
+                      <div className="mt-3">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="neutral" className="w-full">
+                              <Share size={24} />
+                              Bagikan
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent>
+                            <div>
+                              <span className="flex justify-center mb-2">
+                                Bagikan melalui
+                              </span>
+                              <div className="flex justify-evenly p-1">
+                                <WhatsappShareButton
+                                  url={`https://yaw.my.id/quran/${id}`}
+                                  title={`Quran Halaman ${id}`}
+                                >
+                                  <WhatsappIcon size={24} />
+                                </WhatsappShareButton>
+                                <TelegramShareButton
+                                  url={`https://yaw.my.id/quran/${id}`}
+                                  title={`Quran Halaman ${id}`}
+                                >
+                                  <TelegramIcon size={24} />
+                                </TelegramShareButton>
+                                <FacebookShareButton
+                                  url={`https://yaw.my.id/quran/${id}`}
+                                  quote={`Quran Halaman ${id}`}
+                                >
+                                  <FacebookIcon size={24} />
+                                </FacebookShareButton>
+                                <TwitterShareButton
+                                  url={`https://yaw.my.id/quran/${id}`}
+                                  title={`Quran Halaman ${id}`}
+                                >
+                                  <TwitterIcon size={24} />
+                                </TwitterShareButton>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
                     </div>
                     <div className="h-9"></div>
