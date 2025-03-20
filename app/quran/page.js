@@ -18,15 +18,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import HeadComponent from "@/components/HeadComponent";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { History } from "lucide-react";
+import { History, TextCursorInput } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Quran() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const [lastOpenedPage, setLastOpenedPage] = useState(0);
   const [lastSuratOpened, setLastSuratOpened] = useState(0);
   const [lastJuzOpened, setLastJuzOpened] = useState(0);
   const [filteredList, setFilteredList] = useState(SurahList);
+  const [inputtedPage, setInputtedPage] = useState(0);
+
+  const openPage = () => {
+    // valid page are 1 - 604
+    if (inputtedPage < 1 || inputtedPage > 604) {
+      toast({
+        description: `Halaman tidak ditemukan, halaman yang valid adalah 1 - 604`,
+        duration: 2000,
+      });
+      setInputtedPage(1);
+      return;
+    }
+    router.push(`/quran/${inputtedPage}`);
+  };
 
   const continueReading = () => {
     if (!lastOpenedPage) {
@@ -47,7 +63,7 @@ export default function Quran() {
         setLastJuzOpened(juz.juz);
       }
     });
-    console.log(lastOpenedPage)
+    console.log(lastOpenedPage);
     setFilteredList(SurahList);
     SurahList.map((surah) => {
       if (surah.page <= num && surah.page_end >= num) {
@@ -65,7 +81,7 @@ export default function Quran() {
       surah.transliteration.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredList(filtered);
-  }
+  };
 
   return (
     <div className="h-screen py-2">
@@ -87,30 +103,31 @@ export default function Quran() {
               </span>
             </div>
             <div className="flex items-center">
-            <Button onClick={continueReading}>
-                <span className="">Lanjutkan membaca</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="size-6 ml-1"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.72 7.72a.75.75 0 0 1 1.06 0l3.75 3.75a.75.75 0 0 1 0 1.06l-3.75 3.75a.75.75 0 1 1-1.06-1.06l2.47-2.47H3a.75.75 0 0 1 0-1.5h16.19l-2.47-2.47a.75.75 0 0 1 0-1.06Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </Button>
+              <Button onClick={continueReading}>
+                <span className="">Lanjut Baca</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.72 7.72a.75.75 0 0 1 1.06 0l3.75 3.75a.75.75 0 0 1 0 1.06l-3.75 3.75a.75.75 0 1 1-1.06-1.06l2.47-2.47H3a.75.75 0 0 1 0-1.5h16.19l-2.47-2.47a.75.75 0 0 1 0-1.06Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </Button>
             </div>
           </div>
         )}
       </div>
       <div className="my-2">
         <Tabs defaultValue="surah" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="surah">Surah</TabsTrigger>
             <TabsTrigger value="juz">Juz</TabsTrigger>
+            <TabsTrigger value="halaman">Halaman</TabsTrigger>
           </TabsList>
           <TabsContent value="surah">
             <Card>
@@ -119,7 +136,12 @@ export default function Quran() {
                 <CardDescription>
                   <div className="">
                     <span className="mt-2">Daftar Surah dalam Al-Quran</span>
-                    <Input placeholder="Cari Surah" className="mt-2" type="text" onChange={(e) => handleOnChangeInput(e.target.value)} />
+                    <Input
+                      placeholder="Cari Surah"
+                      className="mt-2"
+                      type="text"
+                      onChange={(e) => handleOnChangeInput(e.target.value)}
+                    />
                   </div>
                 </CardDescription>
               </CardHeader>
@@ -131,10 +153,10 @@ export default function Quran() {
                       className="bg-bg rounded-base border-2 my-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none"
                       onClick={() => router.push(`/quran/${surah.page}`)}
                     >
-                      <div className="flex justify-between py-2 pr-4 ">
+                      <div className="flex justify-between py-2 pr-2">
                         <div className="flex">
-                          <div className="flex mx-4 px-2 items-center">
-                            <p className="text-textColorPrimary font-bold text-2xl">
+                          <div className="flex mx-4 px-1 items-center">
+                            <p className="text-textColorPrimary font-bold text-xl">
                               {surah.id}
                             </p>
                           </div>
@@ -142,16 +164,18 @@ export default function Quran() {
                             <p className="text-lg text-textColorPrimary font-bold">
                               {surah.transliteration}
                             </p>
-                            <p className="text-textColorSecondary">
+                            <p className="text-textColorSecondary text-sm">
                               {surah.location} • {surah.num_ayah} Ayat{" "}
                             </p>
-                            <p className="text-textColorSecondary">
+                            <p className="text-textColorSecondary text-sm text-gray-500">
                               {surah.translation}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center">
-                          <p className="text-2xl font-bold">{surah.arabic}</p>
+                          <p className="text-xl font-bold text-right">
+                            {surah.arabic}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -179,28 +203,65 @@ export default function Quran() {
                       onClick={() => router.push(`/quran/${juz.start.page}`)}
                     >
                       <div className="flex justify-between py-2 pr-4 ">
-                      <div className="flex">
-                    <div className="flex mx-4 px-2 items-center">
-                      <p className="text-textColorPrimary font-bold text-2xl">
-                        {juz.juz}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-lg text-textColorPrimary">
-                        Juz {juz.juz}
-                      </p>
-                      <p className="text-xs text-textColorPrimary">
-                        Page {juz.start.page} - {juz.end.page}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-2xl font-bold">{juz.firstWord}</p>
-                  </div>
+                        <div className="flex">
+                          <div className="flex mx-4 px-2 items-center">
+                            <p className="text-textColorPrimary font-bold text-2xl">
+                              {juz.juz}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-lg text-textColorPrimary">
+                              Juz {juz.juz}
+                            </p>
+                            <p className="text-xs text-textColorPrimary">
+                              Page {juz.start.page} - {juz.end.page}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <p className="text-2xl font-bold">{juz.firstWord}</p>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="halaman">
+            <Card>
+              <CardHeader>
+                <CardTitle>Halaman</CardTitle>
+                <CardDescription>
+                  <div className="flex justify-between">
+                    <span>Menuju ke halaman dengan memasukkan nomor halaman</span>
+                  </div>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div>
+                  <Input
+                    placeholder="Masukkan Nomor Halaman"
+                    className="my-2 w-full"
+                    type="number"
+                    onChange={(e) => setInputtedPage(e.target.value)}
+                  />
+                  <Button onClick={openPage} className="bg-secondary">
+                    <span className="">Buka Halaman</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.72 7.72a.75.75 0 0 1 1.06 0l3.75 3.75a.75.75 0 0 1 0 1.06l-3.75 3.75a.75.75 0 1 1-1.06-1.06l2.47-2.47H3a.75.75 0 0 1 0-1.5h16.19l-2.47-2.47a.75.75 0 0 1 0-1.06Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -289,6 +350,7 @@ export default function Quran() {
           </TabPanels>
         </TabGroup> */}
       </div>
+      <div className="h-4"></div>
     </div>
   );
 }
