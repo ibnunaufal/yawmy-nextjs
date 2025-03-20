@@ -16,6 +16,7 @@ import {
   MessageCircleQuestion,
   NotebookPen,
   Scroll,
+  Sparkles,
   Sun,
   User,
 } from "lucide-react";
@@ -352,6 +353,10 @@ export default function Home() {
                 <span className="text-sm mt-1">{item.name}</span>
               </a>
             ))}
+          </div>
+          <div className="w-full py-1 px-2 my-2 bg-bg rounded-md border-2 flex items-center" onClick={() => router.push("/tasbih")}>
+            <Sparkles size={16} />
+            <span className="ml-2 text-sm">Cobain fitur baru, <span className="underline">tasbih digital</span></span>
           </div>
         </div>
       </div>
