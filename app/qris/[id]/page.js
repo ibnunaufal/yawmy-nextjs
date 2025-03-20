@@ -7,7 +7,7 @@ export async function generateMetadata({ params }) {
   const id = params?.id; 
   if (!id) {
     return {
-      title: "QRIS Page",
+      title: "QRIS Page | Yawmy",
       description: "Detail of QRIS page",
     };
   }
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }) {
     const docSnap = await getDoc(qrisRef);
     if (docSnap.exists()) {
       return {
-        title: `QRIS ${docSnap.data().name}` || "QRIS Page",
+        title: `QRIS ${docSnap.data().name} | Yawmy` || "QRIS Page | Yawmy",
         description: `Detail of QRIS: ${docSnap.data().name}`,
       };
     }
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: "QRIS Page",
+    title: "QRIS Page | Yawmy",
     description: "Detail of QRIS page",
   };
 }
