@@ -3,7 +3,7 @@ import "./globals.css";
 import Logo from "@/components/Logo";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
-import { Analytics } from "@vercel/analytics/react"
+import ConditionalAnalytics from "./Analytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -71,7 +71,8 @@ export default function RootLayout({ children }) {
           </div>
         </div>
         <Toaster />
-        <Analytics />
+        {/* <Analytics /> */}
+        <ConditionalAnalytics />
       </body>
     </html>
   );
