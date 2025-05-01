@@ -119,7 +119,7 @@ export default function Home() {
         setUser(authUser);
       }
     });
-    getNextPrayer();
+    // getNextPrayer();
     // console.log(JSON.stringify(user));
     return () => unsubscribe();
   }, []);
