@@ -30,7 +30,18 @@ export default function AlMatsuratPage() {
     }
   };
   useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
     window.addEventListener("scroll", handleScroll);
+    // Trigger once on mount
+    handleScroll();
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
