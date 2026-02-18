@@ -126,7 +126,7 @@ export default function QuranPage({ id }) {
       if (id >= juz.start.page && id <= juz.end.page) {
         let firstPage = juz.start.page;
         let lastPage = juz.end.page;
-        let currentPage = id;
+        let currentPage = Number(id);
         let totalPage = lastPage - firstPage;
         let currentPageInJuz = currentPage - firstPage;
         let progress = (currentPageInJuz / totalPage) * 100;

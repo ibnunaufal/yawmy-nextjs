@@ -28,6 +28,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function Page({ params }) {
-  return <QuranPage id={params.id} />;
+export default async function Page({ params }) {
+    const { id } = await params;
+  return <QuranPage id={id} />;
 }
