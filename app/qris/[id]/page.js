@@ -31,7 +31,8 @@ export async function generateMetadata({ params }) {
     description: "Detail of QRIS page",
   };
 }
-export default function Page({ params }) {
-  return <QrisPage id={params.id} />;
+export default async function Page({ params }) {
+  const { id } = await params;
+  return <QrisPage id={id} />;
 }
 
